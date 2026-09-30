@@ -64,7 +64,7 @@ Full Phase 0 document lives in the project files (`phase-0/REEM_LIFE_OS_Phase0_A
 
 ## 5. Stack and code layout
 
-Next.js **15.5** (App Router) · React 19 · TypeScript **5.9** (TS 7 breaks `next.config.ts` on Next 15) · Tailwind CSS 4 · Radix Dialog · next-themes · lucide-react · Supabase (Postgres + Auth via `@supabase/ssr`) · Drizzle ORM · Vitest · Playwright · fonts via `@fontsource` (IBM Plex Sans Arabic, IBM Plex Sans, Newsreader). Hosting: Vercel.
+Next.js **15.5** (App Router) · React 19 · TypeScript **5.9** (TS 7 breaks `next.config.ts` on Next 15) · Tailwind CSS 4 · Radix Dialog · next-themes · lucide-react · Supabase (Postgres + Auth via `@supabase/ssr`) · Drizzle ORM · Vitest · Playwright · fonts via `@fontsource` (IBM Plex Sans Arabic, IBM Plex Sans, Newsreader). Runs **locally on Reem's Mac** (decided 30 Sep 2026: she does not want it online). No hosting.
 
 ```
 src/app/globals.css          design tokens (the only place colours are defined)
@@ -110,19 +110,15 @@ npm run db:generate / db:migrate    # Drizzle (needs DATABASE_URL)
 ```
 The Ctrl+K test waits for `networkidle` because the shortcut listens only after hydration.
 
-## 8. Connection status
+## 8. Where it runs (decided 30 Sep 2026)
 
-- **GitHub:** `reemwadialkubisi-wq/new`, branch `main` (repository is public; Reem may switch it to private).
-- **Supabase:** project created by Reem. No tables yet (Phase 2 applies migrations).
-- **Vercel:** not deployed yet. Reem imports the repo and sets these environment variables (values only in Vercel, never in the repo or chat):
-  - `NEXT_PUBLIC_SUPABASE_URL`: Supabase Project URL
-  - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Supabase anon public key
-  - `ALLOWED_EMAIL`: Reem's email (required)
-  - `APP_TIMEZONE`: `Asia/Riyadh` unless she says otherwise
-  - `DATABASE_URL`: needed from Phase 2 for migrations
-  Then in Supabase → Authentication → URL Configuration: Site URL = the Vercel URL, Redirect URL = `https://<vercel-domain>/auth/callback`.
+- **Local only, on Reem's Mac.** Not online, no Vercel. Run with `npm run dev` and open http://localhost:3000.
+- **No login locally.** With the Supabase env vars unset the app skips auth (single local user). The magic-link code stays for a possible cloud option later but is not used.
+- **Database (proposed default for Phase 2, awaiting Reem's yes):** a local SQLite file via Drizzle (`better-sqlite3`), stored in the project folder (e.g. `data/reem.db`, git-ignored), with a simple backup/export. No Supabase account needed. Supabase cloud stays optional for later sync.
+- **GitHub:** `reemwadialkubisi-wq/new`, branch `main` (public; Reem may switch it to private). Never commit the database file.
+- **Mac setup:** install Node.js LTS from nodejs.org → `git clone https://github.com/reemwadialkubisi-wq/new.git reem-life-os` → `cd reem-life-os` → `npm install` → `npm run dev` → open http://localhost:3000.
 
 ## 9. Next steps
 
-1. Get Reem's **approval of Phase 1** (and her Vercel link to test sign-in).
-2. Only then start **Phase 2 — Annual / Quarter / Month**: `PeriodPlan` + `AreaFocus` + Important Dates (Event) tables with migrations and RLS, year selector with archive, Q1–Q4, months with real 4/5 weeks, themes, top outcomes, area focus, editable settings (week start, time zone, capacity). Test calendar correctness, persistence, forms and errors, then stop for approval again.
+1. Get Reem's **approval of Phase 1** (she runs it locally on her Mac) and her yes on the local SQLite default.
+2. Only then start **Phase 2 — Annual / Quarter / Month**: `PeriodPlan` + `AreaFocus` + Important Dates (Event) tables with migrations, year selector with archive, Q1–Q4, months with real 4/5 weeks, themes, top outcomes, area focus, editable settings (week start, time zone, capacity). Test calendar correctness, persistence, forms and errors, then stop for approval again.

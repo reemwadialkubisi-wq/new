@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronRight, Plus } from "lucide-react";
+import { ChevronLeft, Plus } from "lucide-react";
 import { EnergyChip, Kbd, type Energy } from "@/components/ui/status";
 import { cn } from "@/lib/utils";
 import { MobileDrawer } from "./mobile-nav";
@@ -21,12 +21,12 @@ export interface TimeBarData {
 export function TimeBar({ data, authConfigured }: { data: TimeBarData; authConfigured: boolean }) {
   const { open } = useQuickCapture();
   const seg = "shrink-0 rounded-sm px-1.5 py-0.5 text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink";
-  const sep = <ChevronRight className="size-3.5 shrink-0 text-ink-4" aria-hidden />;
+  const sep = <ChevronLeft className="size-3.5 shrink-0 text-ink-4" aria-hidden />;
   return (
     <div className="sticky top-0 z-20 border-b border-border bg-bg/90 backdrop-blur">
       <div className="flex h-14 items-center gap-3 px-4 sm:px-8 lg:px-10">
         <MobileDrawer authConfigured={authConfigured} />
-        <nav aria-label="Current period" className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto text-[13px] [scrollbar-width:none]">
+        <nav aria-label="أين أنا الآن" className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto text-[13px] [scrollbar-width:none]">
           <Link href={data.year.href} className={cn(seg, "hidden font-medium text-ink sm:inline")}>{data.year.label}</Link>
           <span className="hidden sm:inline">{sep}</span>
           <Link href={data.quarter.href} className={cn(seg, "hidden sm:inline")}>
@@ -40,12 +40,12 @@ export function TimeBar({ data, authConfigured }: { data: TimeBarData; authConfi
           </Link>
           <span className="hidden md:inline">{sep}</span>
           <Link href={data.week.href} className={seg}>
-            {data.week.label}
+            <bdi>{data.week.label}</bdi>
             <span className="text-ink-3"> · {data.week.range}</span>
           </Link>
           {sep}
           <Link href={data.day.href} className={cn(seg, "font-medium text-ink")}>{data.day.label}</Link>
-          <Link href="/today" className="ml-1 shrink-0" aria-label="Today's energy">
+          <Link href="/today" className="ms-1 shrink-0" aria-label="طاقة اليوم">
             <EnergyChip level={data.energy} />
           </Link>
         </nav>
@@ -55,8 +55,8 @@ export function TimeBar({ data, authConfigured }: { data: TimeBarData; authConfi
           className="hidden h-8 shrink-0 items-center gap-2 rounded-md border border-border-strong bg-surface px-2.5 text-xs text-ink-3 transition-colors hover:text-ink sm:inline-flex"
         >
           <Plus className="size-3.5" aria-hidden />
-          Capture
-          <span className="flex gap-0.5"><Kbd>⌘</Kbd><Kbd>K</Kbd></span>
+          تدوين
+          <span dir="ltr" className="flex gap-0.5"><Kbd>⌘</Kbd><Kbd>K</Kbd></span>
         </button>
         <ThemeToggle />
       </div>

@@ -6,7 +6,10 @@ import {
 } from "lucide-react";
 
 export interface NavItem {
+  /** Arabic label (the interface is Arabic-first). */
   label: string;
+  /** English term shown small beside the Arabic. */
+  en: string;
   href: string;
   icon: LucideIcon;
   /** Extra path prefixes that should mark this item active. */
@@ -23,51 +26,51 @@ export interface NavGroup {
 /** Sidebar structure (Phase 0 §7.1). Every item appears exactly once. */
 export const NAV: NavGroup[] = [
   {
-    id: "overview", label: "Overview", alwaysOpen: true,
+    id: "overview", label: "نظرة عامة", alwaysOpen: true,
     items: [
-      { label: "Home", href: "/", icon: LayoutDashboard },
-      { label: "Today", href: "/today", icon: Sun },
-      { label: "My Week", href: "/week", icon: CalendarRange },
+      { label: "الرئيسية", en: "Home", href: "/", icon: LayoutDashboard },
+      { label: "اليوم", en: "Today", href: "/today", icon: Sun },
+      { label: "أسبوعي", en: "My Week", href: "/week", icon: CalendarRange },
     ],
   },
   {
-    id: "planning", label: "Planning",
+    id: "planning", label: "التخطيط",
     items: [
-      { label: "Month", href: "/month", icon: CalendarDays },
-      { label: "Quarter", href: "/quarter", icon: Layers },
-      { label: "Annual Plan", href: "/year", icon: Mountain },
-      { label: "Goals", href: "/goals", icon: Target },
-      { label: "Projects", href: "/projects", icon: FolderKanban },
+      { label: "الشهر", en: "Month", href: "/month", icon: CalendarDays },
+      { label: "الربع", en: "Quarter", href: "/quarter", icon: Layers },
+      { label: "الخطة السنوية", en: "Annual Plan", href: "/year", icon: Mountain },
+      { label: "الأهداف", en: "Goals", href: "/goals", icon: Target },
+      { label: "المشاريع", en: "Projects", href: "/projects", icon: FolderKanban },
     ],
   },
   {
-    id: "life", label: "Life",
+    id: "life", label: "الحياة",
     items: [
-      { label: "Life Areas", href: "/areas", icon: Compass, match: ["/areas/personal", "/areas/spiritual", "/areas/home"] },
-      { label: "Health & Energy", href: "/areas/health", icon: HeartPulse },
-      { label: "Family", href: "/areas/family", icon: Users },
-      { label: "Career & Work", href: "/areas/career", icon: BriefcaseBusiness },
-      { label: "Finance", href: "/areas/finance", icon: Wallet },
+      { label: "مجالات الحياة", en: "Life Areas", href: "/areas", icon: Compass, match: ["/areas/personal", "/areas/spiritual", "/areas/home"] },
+      { label: "الصحة والطاقة", en: "Health", href: "/areas/health", icon: HeartPulse },
+      { label: "الأسرة", en: "Family", href: "/areas/family", icon: Users },
+      { label: "العمل والمسار المهني", en: "Career", href: "/areas/career", icon: BriefcaseBusiness },
+      { label: "المال", en: "Finance", href: "/areas/finance", icon: Wallet },
     ],
   },
   {
-    id: "growth", label: "Growth",
+    id: "growth", label: "النمو",
     items: [
-      { label: "PhD", href: "/areas/phd", icon: GraduationCap },
-      { label: "English", href: "/areas/english", icon: Languages },
-      { label: "Knowledge", href: "/knowledge", icon: BookOpen },
+      { label: "الدكتوراه", en: "PhD", href: "/areas/phd", icon: GraduationCap },
+      { label: "الإنجليزية", en: "English", href: "/areas/english", icon: Languages },
+      { label: "المعرفة", en: "Knowledge", href: "/knowledge", icon: BookOpen },
     ],
   },
   {
-    id: "create", label: "Create",
+    id: "create", label: "الإبداع",
     items: [
-      { label: "Ideas", href: "/ideas", icon: Lightbulb },
-      { label: "Intellectual Assets", href: "/assets", icon: Library },
+      { label: "الأفكار", en: "Ideas", href: "/ideas", icon: Lightbulb },
+      { label: "الأصول الفكرية", en: "Assets", href: "/assets", icon: Library },
     ],
   },
   {
-    id: "reflect", label: "Reflect",
-    items: [{ label: "Reviews", href: "/reviews", icon: NotebookPen }],
+    id: "reflect", label: "المراجعة",
+    items: [{ label: "المراجعات", en: "Reviews", href: "/reviews", icon: NotebookPen }],
   },
 ];
 

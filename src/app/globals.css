@@ -101,7 +101,7 @@
   --color-red: var(--red);
   --color-red-soft: var(--red-soft);
 
-  --font-sans: "IBM Plex Sans", "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "IBM Plex Sans Arabic", "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Newsreader Variable", "IBM Plex Sans Arabic", Georgia, serif;
   --font-arabic: "IBM Plex Sans Arabic", "IBM Plex Sans", sans-serif;
 

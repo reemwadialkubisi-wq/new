@@ -5,21 +5,21 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
 import { Tabs } from "@/components/ui/tabs";
 
-export const metadata: Metadata = { title: "Goals" };
+export const metadata: Metadata = { title: "الأهداف" };
 
 export default function GoalsPage() {
   return (
     <>
       <PageHeader
-        title="Goals"
-        arabic="الأهداف"
-        subtitle="Desired results. Annual goals and quarterly objectives live here, each with one Life Area."
-        action={<Button variant="primary" disabled title="Arrives in Phase 4">New goal</Button>}
+        title="الأهداف"
+        english="Goals"
+        subtitle="النتائج المطلوبة. هنا الأهداف السنوية وأهداف الربع، ولكل هدف مجال حياة واحد."
+        action={<Button variant="primary" disabled title="في المرحلة 4">هدف جديد</Button>}
       />
-      <Tabs items={["Annual", "Quarterly", "Incubating", "Archived"]} />
-      <EmptyState icon={Target} title="No goals yet" phase={4}>
-        Up to 5 active annual goals. Progress comes from milestones or your own estimate, never from task counts.
-        Finished or dropped goals are archived, not deleted.
+      <Tabs items={["سنوية", "ربعية", "في الحاضنة", "مؤرشفة"]} />
+      <EmptyState icon={Target} title="لا توجد أهداف بعد" phase={4}>
+        حتى 5 أهداف سنوية نشطة. التقدم يأتي من المحطات الرئيسية أو من تقديرك، لا من عدد المهام.
+        الأهداف المكتملة أو المتروكة تُؤرشف ولا تُحذف.
       </EmptyState>
     </>
   );

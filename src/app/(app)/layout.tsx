@@ -12,8 +12,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const now = currentPeriods();
   return (
     <QuickCaptureProvider>
-      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-surface focus:px-3 focus:py-2">
-        Skip to content
+      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-surface focus:px-3 focus:py-2">
+        تخطي إلى المحتوى
       </a>
       <div className="flex min-h-dvh">
         <Sidebar authConfigured={authConfigured} />

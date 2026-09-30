@@ -4,15 +4,15 @@ import { PageHeader } from "@/components/ui/page-header";
 import { SignalDot } from "@/components/ui/status";
 import { LIFE_AREAS } from "@/lib/areas";
 
-export const metadata: Metadata = { title: "Life Areas" };
+export const metadata: Metadata = { title: "مجالات الحياة" };
 
 export default function AreasPage() {
   return (
     <>
       <PageHeader
-        title="Life Areas"
-        arabic="مجالات الحياة"
-        subtitle="Eleven areas, each with a quiet signal: On track · Needs attention · Resting."
+        title="مجالات الحياة"
+        english="Life Areas"
+        subtitle="أحد عشر مجالًا، لكل منها إشارة هادئة: على المسار · يحتاج انتباهًا · في استراحة."
       />
       <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {LIFE_AREAS.map((a) => {
@@ -28,7 +28,7 @@ export default function AreasPage() {
                 </div>
                 <div>
                   <div className="text-base font-medium text-ink">{a.name}</div>
-                  <div lang="ar" dir="rtl" className="text-right font-arabic text-xs text-ink-3">{a.arabic}</div>
+                  <div lang="en" dir="ltr" className="text-end text-xs text-ink-3">{a.english}</div>
                 </div>
                 <p className="text-xs text-ink-3">{a.holds}</p>
               </Link>

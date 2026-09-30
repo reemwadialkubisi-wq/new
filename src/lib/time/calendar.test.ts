@@ -77,3 +77,13 @@ describe("parsing and shifting", () => {
     expect(toISODate(todayIn("UTC", now))).toBe("2026-09-30");
   });
 });
+
+import { formatDayShortAr, formatRangeAr } from "./calendar";
+describe("Arabic formatting keeps Western digits", () => {
+  it("formats days and ranges", () => {
+    expect(formatDayShortAr(day(2026, 9, 1))).toBe("الخميس 1 أكتوبر");
+    expect(formatRangeAr(day(2026, 9, 3), day(2026, 9, 9))).toBe("3–9 أكتوبر");
+    expect(formatRangeAr(day(2026, 9, 31), day(2026, 10, 6))).toBe("31 أكتوبر – 6 نوفمبر");
+    expect(/[٠-٩]/.test(formatDayShortAr(day(2026, 11, 26)))).toBe(false);
+  });
+});

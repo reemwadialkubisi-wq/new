@@ -11,7 +11,7 @@ export function SectionTitle({
 }: { children: React.ReactNode; meta?: React.ReactNode; className?: string; as?: "h2" | "h3" }) {
   return (
     <div className={cn("flex items-baseline justify-between gap-4", className)}>
-      <Tag className="text-2xs font-semibold uppercase tracking-[0.08em] text-ink-3">{children}</Tag>
+      <Tag className="text-xs font-semibold text-ink-3">{children}</Tag>
       {meta ? <div className="text-2xs text-ink-3">{meta}</div> : null}
     </div>
   );

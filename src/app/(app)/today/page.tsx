@@ -4,16 +4,16 @@ import { Card, SectionTitle } from "@/components/ui/card";
 import { MainWithRail, PageHeader } from "@/components/ui/page-header";
 import { ENERGY, type Energy } from "@/components/ui/status";
 import { Planned } from "@/components/ui/planned";
-import { formatDayLong } from "@/lib/time/calendar";
+import { formatDayLongAr } from "@/lib/time/calendar";
 import { currentPeriods } from "@/lib/time/current";
 import { cn } from "@/lib/utils";
 
-export const metadata: Metadata = { title: "Today" };
+export const metadata: Metadata = { title: "اليوم" };
 
 const BIG3 = [
-  { n: 1, label: "Essential", hint: "The one thing that must happen today." },
-  { n: 2, label: "Most Important Outcome", hint: "Moves a weekly outcome forward." },
-  { n: 3, label: "Personal · Family · Development", hint: "Something for you or the people you love." },
+  { n: 1, label: "الأساسي · Essential", hint: "الشيء الوحيد الذي يجب أن يحدث اليوم." },
+  { n: 2, label: "النتيجة الأهم · Most Important Outcome", hint: "تدفع نتيجة أسبوعية إلى الأمام." },
+  { n: 3, label: "شخصي · عائلي · تطوير", hint: "شيء لكِ أو لمن تحبين." },
 ];
 
 export default function TodayPage() {
@@ -22,15 +22,15 @@ export default function TodayPage() {
     <>
       <PageHeader
         eyebrow={`${now.week.label} · ${now.week.range}`}
-        title="Today"
-        arabic="اليوم"
-        subtitle={formatDayLong(now.today)}
+        title="اليوم"
+        english="Today"
+        subtitle={formatDayLongAr(now.today)}
       />
       <MainWithRail
         main={
           <>
             <Card className="p-6">
-              <SectionTitle meta="Step 1">How is your energy today?</SectionTitle>
+              <SectionTitle meta="الخطوة 1">كيف طاقتك اليوم؟ · Energy</SectionTitle>
               <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
                 {(Object.keys(ENERGY) as Energy[]).map((level) => (
                   <div key={level} className="rounded-md border border-border px-4 py-3">
@@ -42,10 +42,10 @@ export default function TodayPage() {
                   </div>
                 ))}
               </div>
-              <p className="mt-3 text-2xs uppercase tracking-[0.08em] text-ink-4">Choosing energy arrives in Phase 3</p>
+              <p className="mt-3 text-2xs text-ink-4">اختيار الطاقة يأتي في المرحلة 3</p>
             </Card>
             <Card className="p-6">
-              <SectionTitle meta="Step 2">Today's Big 3</SectionTitle>
+              <SectionTitle meta="الخطوة 2">أهم 3 لليوم · Big 3</SectionTitle>
               <ol className="mt-3 divide-y divide-border">
                 {BIG3.map((s) => (
                   <li key={s.n} className="flex items-start gap-4 py-3.5">
@@ -58,17 +58,17 @@ export default function TodayPage() {
                 ))}
               </ol>
             </Card>
-            <Planned title="Optional Development" empty="Nothing optional planned" icon={Sparkles} phase={3}>
-              Optional items adapt to your energy: 7 on Green, 4 on Yellow, 1 on Red. Unfinished ones are never overdue.
+            <Planned title="تطوير اختياري · Optional" empty="لا يوجد شيء اختياري مخطط" icon={Sparkles} phase={3}>
+              العناصر الاختيارية تتكيف مع طاقتك: 7 في GREEN، و4 في YELLOW، و1 في RED. غير المنجز منها لا يصبح متأخرًا أبدًا.
             </Planned>
           </>
         }
         rail={
           <>
-            <Planned title="Routine" empty="No routine set" icon={Repeat} phase={5}>Morning and evening routines as simple steps.</Planned>
-            <Planned title="Appointments" empty="No appointments today" icon={CalendarClock} phase={3} />
-            <Planned title="Daily Checkout" meta="≤ 2 min" empty="Close the day calmly" icon={MoonStar} phase={3}>
-              Done · Skip without penalty · Move intentionally · Pause.
+            <Planned title="الروتين · Routine" empty="لا يوجد روتين بعد" icon={Repeat} phase={5}>روتين الصباح والمساء كخطوات بسيطة.</Planned>
+            <Planned title="المواعيد" empty="لا توجد مواعيد اليوم" icon={CalendarClock} phase={3} />
+            <Planned title="إغلاق اليوم · Daily Checkout" meta="≤ 2 د" empty="أغلقي اليوم بهدوء" icon={MoonStar} phase={3}>
+              تم · تخطٍّ بلا لوم · نقل بقصد · إيقاف مؤقت.
             </Planned>
           </>
         }

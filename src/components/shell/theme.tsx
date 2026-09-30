@@ -14,9 +14,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
 }
 
 const OPTIONS = [
-  { value: "light", label: "Light", icon: Sun },
-  { value: "dark", label: "Dark", icon: Moon },
-  { value: "system", label: "System", icon: Monitor },
+  { value: "light", label: "فاتح", icon: Sun },
+  { value: "dark", label: "داكن", icon: Moon },
+  { value: "system", label: "حسب الجهاز", icon: Monitor },
 ] as const;
 
 /** Segmented Light / Dark / System control. */
@@ -25,7 +25,7 @@ export function ThemeSwitch({ compact }: { compact?: boolean }) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   return (
-    <div role="radiogroup" aria-label="Theme" className="inline-flex rounded-md border border-border bg-surface-2 p-0.5">
+    <div role="radiogroup" aria-label="المظهر" className="inline-flex rounded-md border border-border bg-surface-2 p-0.5">
       {OPTIONS.map(({ value, label, icon: Icon }) => {
         const active = mounted && theme === value;
         return (
@@ -62,8 +62,8 @@ export function ThemeToggle() {
       type="button"
       onClick={() => setTheme(dark ? "light" : "dark")}
       className="inline-flex size-8 shrink-0 items-center justify-center rounded-md text-ink-3 transition-colors hover:bg-surface-2 hover:text-ink"
-      aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
-      title={dark ? "Light mode" : "Dark mode"}
+      aria-label={dark ? "التبديل إلى الوضع الفاتح" : "التبديل إلى الوضع الداكن"}
+      title={dark ? "الوضع الفاتح" : "الوضع الداكن"}
     >
       {dark ? <Sun className="size-4" /> : <Moon className="size-4" />}
     </button>

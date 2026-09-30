@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 /** Static view tabs (first one selected). Becomes interactive when the data arrives. */
 export function Tabs({ items, className }: { items: string[]; className?: string }) {
   return (
-    <div role="tablist" aria-label="Views" className={cn("mb-6 flex gap-5 overflow-x-auto border-b border-border", className)}>
+    <div role="tablist" aria-label="طرق العرض" className={cn("mb-6 flex gap-5 overflow-x-auto border-b border-border", className)}>
       {items.map((t, i) => (
         <span
           key={t}

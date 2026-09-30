@@ -10,7 +10,7 @@ import { areaBySlug } from "@/lib/areas";
 type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  return { title: areaBySlug((await params).slug)?.name ?? "Life Area" };
+  return { title: areaBySlug((await params).slug)?.name ?? "مجال الحياة" };
 }
 
 /** ONE template for every Life Area page, with an optional area-specific extra. */
@@ -22,28 +22,28 @@ export default async function AreaPage({ params }: Props) {
 
   return (
     <>
-      <PageHeader eyebrow="Life Area" title={area.name} arabic={area.arabic} subtitle={area.holds} />
+      <PageHeader eyebrow="مجال حياة" title={area.name} english={area.english} subtitle={area.holds} />
       <MainWithRail
         main={
           <>
             {area.extra ? (
-              <Planned title={area.extra.split(":")[0]} empty={area.extra} icon={Sparkles} phase={area.phase} />
+              <Planned title={area.extra.split(" · ")[0]} empty={area.extra.split(" · ")[1] ?? area.extra} icon={Sparkles} phase={area.phase} />
             ) : null}
-            <Planned title="Goals & Projects" empty={`No goals or projects in ${area.name} yet`} icon={Target} phase={4}>
-              Goals and projects tagged with this area appear here. They are edited in Goals and Projects.
+            <Planned title="الأهداف والمشاريع" empty={`لا توجد أهداف أو مشاريع في ${area.name} بعد`} icon={Target} phase={4}>
+              تظهر هنا الأهداف والمشاريع المرتبطة بهذا المجال، وتُعدَّل من صفحتي الأهداف والمشاريع.
             </Planned>
-            <Planned title="This week" empty="Nothing planned for this area this week" icon={CalendarRange} phase={3} />
+            <Planned title="هذا الأسبوع" empty="لا شيء مخطط لهذا المجال هذا الأسبوع" icon={CalendarRange} phase={3} />
           </>
         }
         rail={
           <>
-            <Section title="Signal">
+            <Section title="الإشارة">
               <SignalDot signal={null} />
             </Section>
-            <Planned title="Habits & weekly minimums" empty="No habits yet" icon={Repeat} phase={5}>
-              Continuous systems with a weekly minimum. No streaks.
+            <Planned title="العادات والحد الأدنى الأسبوعي" empty="لا توجد عادات بعد" icon={Repeat} phase={5}>
+              أنظمة مستمرة بحد أدنى أسبوعي، بلا سلاسل متتالية.
             </Planned>
-            <Planned title="Related projects" empty="None yet" icon={FolderKanban} phase={4} />
+            <Planned title="مشاريع مرتبطة" empty="لا شيء بعد" icon={FolderKanban} phase={4} />
           </>
         }
       />

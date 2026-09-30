@@ -165,3 +165,27 @@ export function shiftQuarter(year: number, quarter: number, delta: number) {
   const idx = year * 4 + (quarter - 1) + delta;
   return { year: Math.floor(idx / 4), quarter: ((((idx % 4) + 4) % 4) + 1) as 1 | 2 | 3 | 4 };
 }
+
+/* ---------- Arabic interface formatting (Western digits always) ---------- */
+
+export const MONTHS_AR = [
+  "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو",
+  "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر",
+] as const;
+export const WEEKDAYS_AR = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"] as const;
+
+/** "الخميس 1 أكتوبر" */
+export function formatDayShortAr(d: Date): string {
+  return `${WEEKDAYS_AR[d.getUTCDay()]} ${d.getUTCDate()} ${MONTHS_AR[d.getUTCMonth()]}`;
+}
+
+/** "الخميس 1 أكتوبر 2026" */
+export function formatDayLongAr(d: Date): string {
+  return `${formatDayShortAr(d)} ${d.getUTCFullYear()}`;
+}
+
+/** "3–9 أكتوبر" or "31 أكتوبر – 6 نوفمبر" */
+export function formatRangeAr(a: Date, b: Date): string {
+  if (a.getUTCMonth() === b.getUTCMonth()) return `${a.getUTCDate()}–${b.getUTCDate()} ${MONTHS_AR[b.getUTCMonth()]}`;
+  return `${a.getUTCDate()} ${MONTHS_AR[a.getUTCMonth()]} – ${b.getUTCDate()} ${MONTHS_AR[b.getUTCMonth()]}`;
+}

@@ -22,7 +22,7 @@ export const Select = forwardRef<HTMLSelectElement, React.SelectHTMLAttributes<H
   { className, ...props },
   ref,
 ) {
-  return <select ref={ref} className={cn(control, "h-10 pr-8", className)} {...props} />;
+  return <select ref={ref} className={cn(control, "h-10 pe-8", className)} {...props} />;
 });
 
 export function Field({

@@ -10,7 +10,7 @@ describe("navigation has no duplicates", () => {
     expect(new Set(labels).size).toBe(labels.length);
   });
   it("has the six approved groups in order", () => {
-    expect(NAV.map((g) => g.label)).toEqual(["Overview", "Planning", "Life", "Growth", "Create", "Reflect"]);
+    expect(NAV.map((g) => g.label)).toEqual(["نظرة عامة", "التخطيط", "الحياة", "النمو", "الإبداع", "المراجعة"]);
   });
   it("no Tasks, Calendar or Habits pages exist", () => {
     for (const bad of ["tasks", "calendar", "habits", "todo", "actions"])

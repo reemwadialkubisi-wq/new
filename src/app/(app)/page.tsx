@@ -7,28 +7,28 @@ import { Planned } from "@/components/ui/planned";
 import { CaptureBar } from "@/components/shell/capture-bar";
 import { LIFE_AREAS } from "@/lib/areas";
 import { appConfig } from "@/lib/config";
-import { formatDayLong } from "@/lib/time/calendar";
+import { formatDayLongAr } from "@/lib/time/calendar";
 import { currentPeriods } from "@/lib/time/current";
 import { cn } from "@/lib/utils";
 
 function greeting(timeZone: string) {
   const hour = Number(new Intl.DateTimeFormat("en-GB", { hour: "numeric", hourCycle: "h23", timeZone }).format(new Date()));
-  return hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+  return hour < 12 ? "صباح الخير" : "مساء الخير";
 }
 
-const BIG3 = ["Essential", "Most Important Outcome", "Personal · Family · Development"];
+const BIG3 = ["الأساسي · Essential", "النتيجة الأهم · Most Important Outcome", "شخصي · عائلي · تطوير"];
 
 export default function HomePage() {
   const now = currentPeriods();
   return (
     <div className="space-y-6">
       <PageHeader
-        title={`${greeting(appConfig.timeZone)}, Reem`}
+        title={`${greeting(appConfig.timeZone)} يا ريم`}
         subtitle={
           <>
-            {formatDayLong(now.today)}
+            {formatDayLongAr(now.today)}
             <span className="text-ink-4"> · </span>
-            {now.quarter.label} · {now.month.label} · {now.week.label} ({now.week.range})
+            <bdi>{now.quarter.label}</bdi> · {now.month.label} · <bdi>{now.week.label}</bdi> ({now.week.range})
           </>
         }
       />
@@ -36,8 +36,8 @@ export default function HomePage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
         {/* Today */}
         <Card className="p-6 lg:col-span-8">
-          <SectionTitle meta={<Link href="/today" className="hover:text-ink">Open Today →</Link>}>Today's Energy</SectionTitle>
-          <div className="mt-4 grid grid-cols-3 gap-2" role="list" aria-label="Energy levels">
+          <SectionTitle meta={<Link href="/today" className="hover:text-ink">فتح اليوم ←</Link>}>طاقة اليوم · Energy</SectionTitle>
+          <div className="mt-4 grid grid-cols-3 gap-2" role="list" aria-label="مستويات الطاقة">
             {(Object.keys(ENERGY) as Energy[]).map((level) => (
               <Link
                 key={level}
@@ -54,7 +54,7 @@ export default function HomePage() {
             ))}
           </div>
 
-          <SectionTitle className="mt-8">Today's Big 3</SectionTitle>
+          <SectionTitle className="mt-8">أهم 3 لليوم · Big 3</SectionTitle>
           <ol className="mt-3 divide-y divide-border">
             {BIG3.map((slot, i) => (
               <li key={slot} className="flex items-center gap-4 py-3">
@@ -62,25 +62,25 @@ export default function HomePage() {
                   {i + 1}
                 </span>
                 <span className="flex-1 text-sm text-ink-3">{slot}</span>
-                <span className="text-2xs text-ink-4">Not chosen yet</span>
+                <span className="text-2xs text-ink-4">لم تُختر بعد</span>
               </li>
             ))}
           </ol>
         </Card>
 
-        <Planned className="lg:col-span-4" title="This Week's Outcomes" meta={now.week.label} empty="No outcomes set for this week" icon={Target} phase={3}>
-          Up to 5 results for the week, chosen on Friday or Saturday.
+        <Planned className="lg:col-span-4" title="نتائج هذا الأسبوع · Weekly Outcomes" meta={now.week.label} empty="لا توجد نتائج لهذا الأسبوع بعد" icon={Target} phase={3}>
+          حتى 5 نتائج للأسبوع، تُختار يوم الجمعة أو السبت.
         </Planned>
 
-        <Planned className="lg:col-span-8" title={`${now.quarter.label} Objectives`} empty="No quarter objectives yet" phase={2}>
-          Set up to 5 objectives in the Quarter plan. Progress comes from milestones, never from task counts.
+        <Planned className="lg:col-span-8" title={`أهداف ${now.quarter.label} · Objectives`} empty="لا توجد أهداف لهذا الربع بعد" phase={2}>
+          حتى 5 أهداف في خطة الربع. التقدم يأتي من المحطات الرئيسية، لا من عدد المهام.
         </Planned>
 
-        <Planned className="lg:col-span-4" title="Upcoming Dates" empty="No important dates ahead" icon={CalendarClock} phase={2}>
-          Appointments, deadlines and important dates appear here.
+        <Planned className="lg:col-span-4" title="مواعيد قادمة" empty="لا توجد مواعيد مهمة قادمة" icon={CalendarClock} phase={2}>
+          تظهر هنا المواعيد والتواريخ المهمة والمواعيد النهائية.
         </Planned>
 
-        <Section className="lg:col-span-8" title="Life Areas Status" meta={<Link href="/areas" className="hover:text-ink">All areas →</Link>}>
+        <Section className="lg:col-span-8" title="حالة مجالات الحياة" meta={<Link href="/areas" className="hover:text-ink">كل المجالات ←</Link>}>
           <ul className="grid grid-cols-1 gap-x-6 gap-y-2.5 sm:grid-cols-2 xl:grid-cols-3">
             {LIFE_AREAS.map((a) => (
               <li key={a.slug} className="flex items-center justify-between gap-3">
@@ -89,14 +89,14 @@ export default function HomePage() {
               </li>
             ))}
           </ul>
-          <p className="mt-4 text-2xs text-ink-4">Quiet signals only: On track · Needs attention · Resting. No scores.</p>
+          <p className="mt-4 text-2xs text-ink-4">إشارات هادئة فقط: على المسار · يحتاج انتباهًا · في استراحة. بلا درجات.</p>
         </Section>
 
-        <Section className="lg:col-span-4" title={`Annual Progress ${now.year.label}`}>
-          <Progress value={null} label="Annual progress" />
+        <Section className="lg:col-span-4" title={`التقدم السنوي ${now.year.label}`}>
+          <Progress value={null} label="التقدم السنوي" />
           <div className="mt-5 flex items-center justify-between border-t border-border pt-4 text-xs">
-            <span className="text-ink-3">Load</span>
-            <span className="text-ink-2">Not measured yet</span>
+            <span className="text-ink-3">الحمل · Load</span>
+            <span className="text-ink-2">لم يُقَس بعد</span>
           </div>
         </Section>
       </div>

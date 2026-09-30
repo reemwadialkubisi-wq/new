@@ -9,10 +9,10 @@ import { cn } from "@/lib/utils";
 
 type CaptureKind = "idea" | "task" | "outcome" | "date";
 const KINDS: { value: CaptureKind; label: string; icon: typeof Lightbulb; lands: string }[] = [
-  { value: "idea", label: "Idea", icon: Lightbulb, lands: "Goes to the Idea Inbox. It never becomes a project on its own." },
-  { value: "task", label: "Task", icon: CheckSquare, lands: "Goes to Today, or to a day you choose." },
-  { value: "outcome", label: "Outcome", icon: Target, lands: "Becomes a Weekly Outcome for this week." },
-  { value: "date", label: "Date", icon: CalendarClock, lands: "An appointment, important date or deadline." },
+  { value: "idea", label: "فكرة", icon: Lightbulb, lands: "تذهب إلى صندوق الأفكار، ولا تتحول إلى مشروع من تلقاء نفسها." },
+  { value: "task", label: "مهمة", icon: CheckSquare, lands: "تذهب إلى اليوم، أو إلى يوم تختارينه." },
+  { value: "outcome", label: "نتيجة", icon: Target, lands: "تصبح Weekly Outcome لهذا الأسبوع." },
+  { value: "date", label: "موعد", icon: CalendarClock, lands: "موعد أو تاريخ مهم أو موعد نهائي." },
 ];
 
 const Ctx = createContext<{ open: () => void }>({ open: () => {} });
@@ -59,12 +59,12 @@ function QuickCaptureDialog({ open, onOpenChange }: { open: boolean; onOpenChang
   function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!text.trim()) {
-      setNote("Write a few words first.");
+      setNote("اكتبي بضع كلمات أولًا.");
       inputRef.current?.focus();
       return;
     }
     // Phase 1 is the shell only. Saving connects to the database in Phase 3 (Ideas/Tasks) — see roadmap.
-    setNote("Captured in this preview only. Saving to your Inbox connects once the database is live.");
+    setNote("دُوِّنت في المعاينة فقط. الحفظ في صندوق الأفكار يعمل بعد ربط قاعدة البيانات.");
     setText("");
   }
 
@@ -73,7 +73,7 @@ function QuickCaptureDialog({ open, onOpenChange }: { open: boolean; onOpenChang
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-ink/25 backdrop-blur-[2px] dark:bg-black/50" />
         <Dialog.Content
-          className="fixed left-1/2 top-[14vh] z-50 w-[calc(100vw-2rem)] max-w-xl -translate-x-1/2 rounded-lg border border-border bg-surface shadow-pop focus:outline-none"
+          className="fixed inset-x-0 top-[14vh] z-50 mx-auto w-[calc(100vw-2rem)] max-w-xl rounded-lg border border-border bg-surface shadow-pop focus:outline-none"
           onOpenAutoFocus={(e) => {
             e.preventDefault();
             inputRef.current?.focus();
@@ -81,13 +81,13 @@ function QuickCaptureDialog({ open, onOpenChange }: { open: boolean; onOpenChang
         >
           <form onSubmit={submit}>
             <div className="flex items-center justify-between border-b border-border px-5 py-3">
-              <Dialog.Title className="text-2xs font-semibold uppercase tracking-[0.08em] text-ink-3">Quick Capture</Dialog.Title>
-              <Dialog.Close className="rounded-sm p-1 text-ink-3 hover:bg-surface-2 hover:text-ink" aria-label="Close">
+              <Dialog.Title className="text-xs font-semibold text-ink-3">التدوين السريع · Quick Capture</Dialog.Title>
+              <Dialog.Close className="rounded-sm p-1 text-ink-3 hover:bg-surface-2 hover:text-ink" aria-label="إغلاق">
                 <X className="size-4" />
               </Dialog.Close>
             </div>
             <div className="px-5 pt-4">
-              <label htmlFor="capture-text" className="sr-only">What's on your mind?</label>
+              <label htmlFor="capture-text" className="sr-only">ما الذي يدور في ذهنك؟</label>
               <textarea
                 id="capture-text"
                 ref={inputRef}
@@ -101,11 +101,11 @@ function QuickCaptureDialog({ open, onOpenChange }: { open: boolean; onOpenChang
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) submit(e);
                 }}
-                placeholder="What's on your mind? · ما الذي يدور في ذهنك؟"
+                placeholder="ما الذي يدور في ذهنك؟"
                 className="w-full resize-none bg-transparent text-base leading-relaxed text-ink placeholder:text-ink-4 focus:outline-none"
               />
             </div>
-            <div className="flex flex-wrap gap-1.5 px-5 pb-3" role="radiogroup" aria-label="Capture as">
+            <div className="flex flex-wrap gap-1.5 px-5 pb-3" role="radiogroup" aria-label="نوع التدوين">
               {KINDS.map(({ value, label, icon: Icon }) => (
                 <button
                   key={value}
@@ -126,8 +126,8 @@ function QuickCaptureDialog({ open, onOpenChange }: { open: boolean; onOpenChang
             <div className="flex flex-col gap-3 border-t border-border bg-surface-2/60 px-5 py-3 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-xs text-ink-3" aria-live="polite">{note ?? current.lands}</p>
               <div className="flex shrink-0 items-center gap-2">
-                <span className="hidden items-center gap-1 text-2xs text-ink-4 sm:inline-flex"><Kbd>Ctrl</Kbd><Kbd>↵</Kbd></span>
-                <Button type="submit" variant="primary" size="sm">Capture</Button>
+                <span dir="ltr" className="hidden items-center gap-1 text-2xs text-ink-4 sm:inline-flex"><Kbd>Ctrl</Kbd><Kbd>↵</Kbd></span>
+                <Button type="submit" variant="primary" size="sm">دوِّني</Button>
               </div>
             </div>
           </form>

@@ -33,7 +33,7 @@ export function EmptyState({
         {children ? <div className="max-w-prose text-sm text-ink-3">{children}</div> : null}
       </div>
       {phase ? (
-        <span className="text-2xs font-medium uppercase tracking-[0.08em] text-ink-4">Arrives in Phase {phase}</span>
+        <span className="text-2xs font-medium text-ink-4">تأتي في المرحلة {phase} · Phase {phase}</span>
       ) : null}
       {action}
     </div>

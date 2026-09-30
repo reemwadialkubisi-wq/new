@@ -11,7 +11,7 @@ import { Providers } from "@/components/shell/theme";
 
 export const metadata: Metadata = {
   title: { default: "REEM LIFE OS", template: "%s · REEM LIFE OS" },
-  description: "نظام ريم لإدارة الحياة السنوية — a personal Life Operating System.",
+  description: "نظام ريم لإدارة الحياة السنوية · Personal Life Operating System",
   robots: { index: false, follow: false },
 };
 
@@ -21,7 +21,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" dir="ltr" suppressHydrationWarning>
+    <html lang="ar" dir="rtl" suppressHydrationWarning>
       <body>
         <Providers>{children}</Providers>
       </body>

@@ -6,7 +6,7 @@ import { MainWithRail, PageHeader, PeriodNav } from "@/components/ui/page-header
 import { Planned } from "@/components/ui/planned";
 import { appConfig } from "@/lib/config";
 import {
-  MONTHS, addDays, formatRange, parseISODate, sameDay, shortMonth, shortWeekday, toISODate, weekInfo,
+  MONTHS_AR, WEEKDAYS_AR, addDays, formatRangeAr, parseISODate, sameDay, toISODate, weekInfo,
 } from "@/lib/time/calendar";
 import { currentPeriods } from "@/lib/time/current";
 import { cn } from "@/lib/utils";
@@ -15,10 +15,10 @@ type Props = { params: Promise<{ date: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const d = parseISODate((await params).date);
-  return { title: d ? `Week ${weekInfo(d, appConfig.weekStart).number}` : "Week" };
+  return { title: d ? `الأسبوع ${weekInfo(d, appConfig.weekStart).number}` : "الأسبوع" };
 }
 
-const WEEK_AREAS = ["Work", "Family", "Health", "PhD / Knowledge", "English", "Personal / Social"];
+const WEEK_AREAS = ["العمل", "الأسرة", "الصحة", "الدكتوراه والمعرفة", "الإنجليزية", "شخصي واجتماعي"];
 
 export default async function WeekPage({ params }: Props) {
   const d = parseISODate((await params).date);
@@ -31,13 +31,13 @@ export default async function WeekPage({ params }: Props) {
   return (
     <>
       <PageHeader
-        eyebrow={`${w.year} · Q${w.quarter} · ${MONTHS[w.month]}`}
-        title={`Week ${w.number}`}
-        arabic="أسبوعي"
+        eyebrow={`${w.year} · Q${w.quarter} · ${MONTHS_AR[w.month]}`}
+        title={`الأسبوع ${w.number}`}
+        english={`W${w.number}`}
         subtitle={
           <>
-            {formatRange(w.start, w.end)} {w.end.getUTCFullYear()} · Saturday to Friday
-            {w.bridge ? <span className="text-ink-3"> · Bridge week between Q{w.quarter} and Q{(w.quarter % 4) + 1}</span> : null}
+            {formatRangeAr(w.start, w.end)} {w.end.getUTCFullYear()} · من السبت إلى الجمعة
+            {w.bridge ? <span className="text-ink-3"> · أسبوع عابر بين Q{w.quarter} وQ{(w.quarter % 4) + 1}</span> : null}
           </>
         }
         action={
@@ -56,13 +56,13 @@ export default async function WeekPage({ params }: Props) {
             const isFriday = day.getUTCDay() === 5;
             return (
               <li key={toISODate(day)} className={cn("px-3 py-3", isToday && "bg-accent-soft")}>
-                <div className={cn("text-2xs font-medium uppercase tracking-[0.08em]", isToday ? "text-accent-text" : "text-ink-3")}>
-                  {shortWeekday(day)}
+                <div className={cn("text-2xs font-medium", isToday ? "text-accent-text" : "text-ink-3")}>
+                  {WEEKDAYS_AR[day.getUTCDay()]}
                 </div>
                 <div className={cn("mt-0.5 text-base tabular-nums", isToday ? "font-semibold text-ink" : "text-ink-2")}>
-                  {day.getUTCDate()} <span className="text-xs text-ink-3">{shortMonth(day.getUTCMonth())}</span>
+                  {day.getUTCDate()} <span className="text-xs text-ink-3">{MONTHS_AR[day.getUTCMonth()]}</span>
                 </div>
-                <div className="mt-1 h-4 text-2xs text-ink-4">{isToday ? "Today" : isFriday ? "Rest · Review" : ""}</div>
+                <div className="mt-1 h-4 text-2xs text-ink-4">{isToday ? "اليوم" : isFriday ? "راحة · مراجعة" : ""}</div>
               </li>
             );
           })}
@@ -72,18 +72,18 @@ export default async function WeekPage({ params }: Props) {
       <MainWithRail
         main={
           <>
-            <Section title="Weekly Theme">
-              <p className="text-sm text-ink-3">No theme yet. One short phrase that sets the tone of the week.</p>
+            <Section title="عنوان الأسبوع · Theme">
+              <p className="text-sm text-ink-3">لا يوجد عنوان بعد. عبارة قصيرة تحدد روح الأسبوع.</p>
             </Section>
-            <Planned title="Weekly Outcomes" meta="max 5" empty="No outcomes for this week" icon={Target} phase={3}>
-              Results, not tasks. A week at 70–80% is a strong week.
+            <Planned title="نتائج الأسبوع · Weekly Outcomes" meta="حتى 5" empty="لا توجد نتائج لهذا الأسبوع" icon={Target} phase={3}>
+              نتائج وليست مهام. أسبوع بنسبة 70–80% أسبوع قوي.
             </Planned>
-            <Section title="Area Focus">
+            <Section title="تركيز المجالات · Area Focus">
               <ul className="grid grid-cols-1 gap-x-8 sm:grid-cols-2">
                 {WEEK_AREAS.map((a) => (
                   <li key={a} className="flex items-center justify-between border-b border-border py-2.5 text-sm">
                     <span className="text-ink-2">{a}</span>
-                    <span className="text-2xs text-ink-4">Not set</span>
+                    <span className="text-2xs text-ink-4">لم يُحدد</span>
                   </li>
                 ))}
               </ul>
@@ -92,10 +92,10 @@ export default async function WeekPage({ params }: Props) {
         }
         rail={
           <>
-            <Planned title="Appointments" empty="No appointments this week" icon={CalendarClock} phase={3} />
-            <Planned title="Buffer" empty="No buffer reserved" icon={Hourglass} phase={3}>Keep space for the unexpected.</Planned>
-            <Planned title="Weekly Review" meta="Friday · ≈ 20 min" empty="Opens on Friday" icon={NotebookPen} phase={3}>
-              Progress, energy, wins, challenges, stop, continue, next week's priorities.
+            <Planned title="المواعيد" empty="لا توجد مواعيد هذا الأسبوع" icon={CalendarClock} phase={3} />
+            <Planned title="وقت احتياطي · Buffer" empty="لا يوجد وقت احتياطي محجوز" icon={Hourglass} phase={3}>اتركي مساحة لما لا يُتوقع.</Planned>
+            <Planned title="المراجعة الأسبوعية · Weekly Review" meta="الجمعة · ≈ 20 د" empty="تُفتح يوم الجمعة" icon={NotebookPen} phase={3}>
+              التقدم، الطاقة، الإنجازات، التحديات، ما يتوقف، ما يستمر، أولويات الأسبوع القادم.
             </Planned>
           </>
         }

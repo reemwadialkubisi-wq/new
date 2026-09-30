@@ -6,34 +6,34 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { MainWithRail, PageHeader } from "@/components/ui/page-header";
 import { currentPeriods } from "@/lib/time/current";
 
-export const metadata: Metadata = { title: "Reviews" };
+export const metadata: Metadata = { title: "المراجعات" };
 
 export default function ReviewsPage() {
   const now = currentPeriods();
   const reviews = [
-    { name: "Daily Checkout", time: "≤ 2 min", where: "Today", href: "/today" },
-    { name: "Weekly Review", time: "≈ 20 min", where: `${now.week.label} · Friday`, href: now.week.href },
-    { name: "Monthly Review", time: "≤ 60 min", where: now.month.label, href: now.month.href },
-    { name: "Quarterly Review", time: "≈ 90 min", where: now.quarter.label, href: now.quarter.href },
-    { name: "Annual Review", time: "≈ 2 h", where: now.year.label, href: now.year.href },
+    { name: "إغلاق اليوم · Daily Checkout", time: "≤ 2 د", where: "اليوم", href: "/today" },
+    { name: "المراجعة الأسبوعية", time: "≈ 20 د", where: `${now.week.label} · الجمعة`, href: now.week.href },
+    { name: "المراجعة الشهرية", time: "≤ 60 د", where: now.month.label, href: now.month.href },
+    { name: "المراجعة الربعية", time: "≈ 90 د", where: now.quarter.label, href: now.quarter.href },
+    { name: "المراجعة السنوية", time: "≈ 2 س", where: now.year.label, href: now.year.href },
   ];
   return (
     <>
       <PageHeader
-        title="Reviews"
-        arabic="المراجعات"
-        subtitle="Reviews are for decisions, not for judging yourself. Each one is written on its period page."
+        title="المراجعات"
+        english="Reviews"
+        subtitle="المراجعة لاتخاذ القرار، لا لمحاسبة النفس. كل مراجعة تُكتب في صفحة فترتها."
       />
       <MainWithRail
         main={
-          <Section title="History">
-            <EmptyState compact icon={History} title="No reviews written yet" phase={8}>
-              Every review and the decisions it made (continue, stop, move, pause) will be listed here.
+          <Section title="السجل">
+            <EmptyState compact icon={History} title="لم تُكتب أي مراجعة بعد" phase={8}>
+              ستظهر هنا كل مراجعة والقرارات التي اتخذتها: استمرار، توقف، نقل، إيقاف مؤقت.
             </EmptyState>
           </Section>
         }
         rail={
-          <Section title="Review rhythm">
+          <Section title="إيقاع المراجعات">
             <ul className="divide-y divide-border">
               {reviews.map((r) => (
                 <li key={r.name}>

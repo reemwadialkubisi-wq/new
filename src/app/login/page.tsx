@@ -6,7 +6,7 @@ import { authConfigured } from "@/lib/config";
 import { createSupabaseServer } from "@/lib/supabase/server";
 import { headers } from "next/headers";
 
-export const metadata: Metadata = { title: "Sign in" };
+export const metadata: Metadata = { title: "تسجيل الدخول" };
 export const dynamic = "force-dynamic";
 
 async function sendLink(formData: FormData) {
@@ -27,10 +27,10 @@ async function sendLink(formData: FormData) {
 }
 
 const ERRORS: Record<string, string> = {
-  invalid: "Please enter a valid email address.",
-  failed: "The sign-in link could not be sent. Please try again in a moment.",
-  "not-allowed": "This account does not have access.",
-  link: "That sign-in link has expired. Request a new one.",
+  invalid: "أدخلي بريدًا إلكترونيًا صحيحًا.",
+  failed: "تعذّر إرسال رابط الدخول. حاولي مرة أخرى بعد قليل.",
+  "not-allowed": "هذا الحساب لا يملك صلاحية الدخول.",
+  link: "انتهت صلاحية رابط الدخول. اطلبي رابطًا جديدًا.",
 };
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string; sent?: string }> }) {
@@ -40,19 +40,19 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
     <main className="flex min-h-dvh items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <div className="mb-10 text-center">
-          <div className="text-[13px] font-semibold tracking-[0.14em] text-ink">REEM LIFE OS</div>
-          <div lang="ar" dir="rtl" className="font-arabic text-xs text-ink-3">نظام ريم لإدارة الحياة السنوية</div>
+          <div className="text-base font-semibold text-ink">نظام ريم لإدارة الحياة السنوية</div>
+          <div lang="en" dir="ltr" className="text-[11px] font-semibold tracking-[0.14em] text-ink-3">REEM LIFE OS</div>
         </div>
         {sp.sent ? (
           <p className="rounded-lg border border-border bg-surface p-6 text-center text-sm text-ink-2" role="status">
-            Check your email for a sign-in link.
+            تحققي من بريدك: أرسلنا لك رابط الدخول.
           </p>
         ) : (
           <form action={sendLink} className="space-y-4 rounded-lg border border-border bg-surface p-6">
-            <Field label="Email" htmlFor="email" error={sp.error ? ERRORS[sp.error] : undefined}>
+            <Field label="البريد الإلكتروني" htmlFor="email" error={sp.error ? ERRORS[sp.error] : undefined}>
               <Input id="email" name="email" type="email" autoComplete="email" dir="ltr" required aria-invalid={Boolean(sp.error)} />
             </Field>
-            <Button type="submit" variant="primary" className="w-full">Send sign-in link</Button>
+            <Button type="submit" variant="primary" className="w-full">إرسال رابط الدخول</Button>
           </form>
         )}
       </div>

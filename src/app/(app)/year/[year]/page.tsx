@@ -6,14 +6,14 @@ import { Section } from "@/components/ui/card";
 import { MainWithRail, PageHeader, PeriodNav } from "@/components/ui/page-header";
 import { Planned } from "@/components/ui/planned";
 import { Progress } from "@/components/ui/status";
-import { MONTHS, parseYear, quarterKey } from "@/lib/time/calendar";
+import { MONTHS_AR, parseYear, quarterKey } from "@/lib/time/calendar";
 import { currentPeriods } from "@/lib/time/current";
 import { cn } from "@/lib/utils";
 
 type Props = { params: Promise<{ year: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  return { title: `Annual Plan ${(await params).year}` };
+  return { title: `الخطة السنوية ${(await params).year}` };
 }
 
 export default async function YearPage({ params }: Props) {
@@ -26,13 +26,13 @@ export default async function YearPage({ params }: Props) {
   return (
     <>
       <PageHeader
-        eyebrow={year < thisYear ? "Archive · read only" : year === thisYear ? "Current year" : "Future year"}
-        title={`Annual Plan ${year}`}
-        arabic="الخطة السنوية"
-        subtitle="Annual Theme not set"
+        eyebrow={year < thisYear ? "الأرشيف · للقراءة فقط" : year === thisYear ? "السنة الحالية" : "سنة قادمة"}
+        title={`الخطة السنوية ${year}`}
+        english="Annual Plan"
+        subtitle="لم يُحدد عنوان السنة بعد"
         action={<PeriodNav prev={`/year/${year - 1}`} next={`/year/${year + 1}`} current={now.year.href} />}
       />
-      <nav aria-label="Years" className="mb-6 flex flex-wrap gap-1.5">
+      <nav aria-label="السنوات" className="mb-6 flex flex-wrap gap-1.5">
         {years.map((y) => (
           <Link
             key={y}
@@ -44,7 +44,7 @@ export default async function YearPage({ params }: Props) {
             )}
           >
             {y}
-            {y < thisYear ? <span className="ml-1.5 text-ink-4">archive</span> : null}
+            {y < thisYear ? <span className="ms-1.5 text-ink-4">أرشيف</span> : null}
           </Link>
         ))}
       </nav>
@@ -53,32 +53,32 @@ export default async function YearPage({ params }: Props) {
           <Link key={q} href={`/quarter/${quarterKey(year, q)}`} className="rounded-lg border border-border bg-surface px-5 py-4 transition-colors hover:border-border-strong">
             <div className="flex items-baseline justify-between">
               <span className="text-base font-medium text-ink">Q{q}</span>
-              <span className="text-2xs text-ink-3">{MONTHS[(q - 1) * 3].slice(0, 3)} – {MONTHS[(q - 1) * 3 + 2].slice(0, 3)}</span>
+              <span className="text-2xs text-ink-3">{MONTHS_AR[(q - 1) * 3]} – {MONTHS_AR[(q - 1) * 3 + 2]}</span>
             </div>
-            <Progress value={null} label={`Q${q} progress`} className="mt-3" />
+            <Progress value={null} label={`تقدم Q${q}`} className="mt-3" />
           </Link>
         ))}
       </div>
       <MainWithRail
         main={
           <>
-            <Planned title="Vision & Direction" empty="No annual direction yet" icon={Compass} phase={2}>
-              Annual Theme, Vision and Top Priorities: the few words that guide the year.
+            <Planned title="الرؤية والاتجاه · Vision" empty="لا يوجد اتجاه سنوي بعد" icon={Compass} phase={2}>
+              عنوان السنة والرؤية والأولويات: الكلمات القليلة التي توجه السنة.
             </Planned>
-            <Planned title="Annual Goals" meta="max 5 active" empty="No annual goals yet" icon={Target} phase={4}>
-              Goals are never turned into daily tasks automatically.
+            <Planned title="الأهداف السنوية · Annual Goals" meta="حتى 5 نشطة" empty="لا توجد أهداف سنوية بعد" icon={Target} phase={4}>
+              الأهداف لا تتحول إلى مهام يومية تلقائيًا أبدًا.
             </Planned>
-            <Planned title="Major Projects" empty="No major projects yet" icon={FolderKanban} phase={4} />
+            <Planned title="المشاريع الكبرى" empty="لا توجد مشاريع كبرى بعد" icon={FolderKanban} phase={4} />
           </>
         }
         rail={
           <>
-            <Planned title="Key Milestones" empty="No milestones yet" icon={Flag} phase={4} />
-            <Planned title="Important Dates" empty="No important dates yet" icon={CalendarClock} phase={2} />
-            <Section title="Life Areas focus">
-              <p className="text-sm text-ink-3">Which areas lead this year and which rest. Set in Phase 2.</p>
+            <Planned title="المحطات الرئيسية · Milestones" empty="لا توجد محطات بعد" icon={Flag} phase={4} />
+            <Planned title="تواريخ مهمة" empty="لا توجد تواريخ مهمة بعد" icon={CalendarClock} phase={2} />
+            <Section title="تركيز مجالات الحياة">
+              <p className="text-sm text-ink-3">أي المجالات تقود هذه السنة وأيها يستريح. يُحدد في المرحلة 2.</p>
             </Section>
-            <Planned title="Annual Review" meta="≈ 2 h" empty="Opens in December" icon={NotebookPen} phase={8} />
+            <Planned title="المراجعة السنوية · Annual Review" meta="≈ 2 س" empty="تُفتح في ديسمبر" icon={NotebookPen} phase={8} />
           </>
         }
       />

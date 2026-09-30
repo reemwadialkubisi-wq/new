@@ -5,9 +5,9 @@ import { cn } from "@/lib/utils";
 export type Energy = "GREEN" | "YELLOW" | "RED";
 
 export const ENERGY: Record<Energy, { label: string; meaning: string; dot: string; soft: string; text: string }> = {
-  GREEN: { label: "Green", meaning: "Normal plan", dot: "bg-green", soft: "bg-green-soft", text: "text-green-text" },
-  YELLOW: { label: "Yellow", meaning: "Reduce optional load", dot: "border-[1.5px] border-green bg-transparent", soft: "bg-yellow-soft", text: "text-yellow-text" },
-  RED: { label: "Red", meaning: "Essentials only", dot: "bg-red", soft: "bg-red-soft", text: "text-red-text" },
+  GREEN: { label: "Green", meaning: "الخطة العادية", dot: "bg-green", soft: "bg-green-soft", text: "text-green-text" },
+  YELLOW: { label: "Yellow", meaning: "تخفيف الاختياري", dot: "border-[1.5px] border-green bg-transparent", soft: "bg-yellow-soft", text: "text-yellow-text" },
+  RED: { label: "Red", meaning: "الأساسيات فقط", dot: "bg-red", soft: "bg-red-soft", text: "text-red-text" },
 };
 
 export function EnergyChip({ level, className }: { level: Energy | null; className?: string }) {
@@ -15,7 +15,7 @@ export function EnergyChip({ level, className }: { level: Energy | null; classNa
     return (
       <span className={cn("inline-flex items-center gap-1.5 rounded-full border border-dashed border-border-strong px-2.5 py-0.5 text-2xs font-medium text-ink-3", className)}>
         <span className="size-1.5 rounded-full bg-ink-4" aria-hidden />
-        <span className="max-sm:sr-only">Energy not set</span>
+        <span className="max-sm:sr-only">الطاقة لم تُحدَّد</span>
       </span>
     );
   const e = ENERGY[level];
@@ -31,13 +31,13 @@ export function EnergyChip({ level, className }: { level: Energy | null; classNa
 
 export type AreaSignal = "on-track" | "needs-attention" | "resting";
 const SIGNAL: Record<AreaSignal, { label: string; dot: string }> = {
-  "on-track": { label: "On track", dot: "bg-green" },
-  "needs-attention": { label: "Needs attention", dot: "bg-accent" },
-  resting: { label: "Resting", dot: "bg-ink-4" },
+  "on-track": { label: "على المسار", dot: "bg-green" },
+  "needs-attention": { label: "يحتاج انتباهًا", dot: "bg-accent" },
+  resting: { label: "في استراحة", dot: "bg-ink-4" },
 };
 
 export function SignalDot({ signal, withLabel = true }: { signal: AreaSignal | null; withLabel?: boolean }) {
-  const s = signal ? SIGNAL[signal] : { label: "No signal yet", dot: "border border-ink-4 bg-transparent" };
+  const s = signal ? SIGNAL[signal] : { label: "لا توجد إشارة بعد", dot: "border border-ink-4 bg-transparent" };
   return (
     <span className="inline-flex items-center gap-2 text-xs text-ink-2">
       <span className={cn("size-2 rounded-full", s.dot)} aria-hidden />
@@ -58,10 +58,14 @@ const STATUS: Record<EntityStatus, string> = {
   archived: "bg-surface-2 text-ink-4",
 };
 
+const STATUS_AR: Record<EntityStatus, string> = {
+  active: "نشط", planned: "مخطط", paused: "متوقف مؤقتًا", incubating: "في الحاضنة", completed: "مكتمل", archived: "مؤرشف",
+};
+
 export function StatusBadge({ status }: { status: EntityStatus }) {
   return (
-    <span className={cn("inline-flex h-5 items-center rounded-sm px-2 text-2xs font-medium capitalize", STATUS[status])}>
-      {status}
+    <span className={cn("inline-flex h-5 items-center rounded-sm px-2 text-2xs font-medium", STATUS[status])}>
+      {STATUS_AR[status]}
     </span>
   );
 }
@@ -72,8 +76,9 @@ export type Tier = "must" | "should" | "could";
 export function TierBadge({ tier }: { tier: Tier }) {
   const cls = { must: "border-ink text-ink", should: "border-border-strong text-ink-2", could: "border-border text-ink-3" }[tier];
   return (
-    <span className={cn("inline-flex h-5 items-center rounded-sm border px-1.5 text-2xs font-medium capitalize", cls)}>
-      {tier}
+    <span className={cn("inline-flex h-5 items-center gap-1 rounded-sm border px-1.5 text-2xs font-medium", cls)}>
+      {{ must: "ضروري", should: "مهم", could: "ممكن" }[tier]}
+      <span lang="en" className="text-ink-4 capitalize">{tier}</span>
     </span>
   );
 }
@@ -94,7 +99,7 @@ export function Progress({ value, label, className }: { value: number | null; la
       >
         <div className="h-full rounded-full bg-green transition-[width]" style={{ width: `${v}%` }} />
       </div>
-      <span className="w-9 text-right text-2xs tabular-nums text-ink-3">{value == null ? "—" : `${v}%`}</span>
+      <span className="w-9 text-end text-2xs tabular-nums text-ink-3">{value == null ? "—" : `${v}%`}</span>
     </div>
   );
 }

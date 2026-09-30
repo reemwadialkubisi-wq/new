@@ -4,20 +4,20 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
 
-export const metadata: Metadata = { title: "Intellectual Assets" };
+export const metadata: Metadata = { title: "الأصول الفكرية" };
 
-const STAGES = ["Idea", "Research", "Write", "Publish", "Reuse"];
+const STAGES = ["فكرة", "بحث", "كتابة", "نشر", "إعادة استخدام"];
 
 export default function AssetsPage() {
   return (
     <>
       <PageHeader
-        title="Intellectual Assets"
-        arabic="الأصول الفكرية"
-        subtitle="Books, articles, research, courses, videos and frameworks you can reuse."
-        action={<Button variant="primary" disabled title="Arrives in Phase 7">New asset</Button>}
+        title="الأصول الفكرية"
+        english="Intellectual Assets"
+        subtitle="كتب ومقالات وأبحاث ودورات وفيديوهات وأطر عمل قابلة لإعادة الاستخدام."
+        action={<Button variant="primary" disabled title="في المرحلة 7">أصل جديد</Button>}
       />
-      <ol className="mb-6 grid grid-cols-5 gap-px overflow-hidden rounded-lg border border-border bg-border" aria-label="Asset pipeline">
+      <ol className="mb-6 grid grid-cols-5 gap-px overflow-hidden rounded-lg border border-border bg-border" aria-label="مسار الأصول">
         {STAGES.map((s, i) => (
           <li key={s} className="bg-surface px-3 py-3 sm:px-4">
             <div className="text-2xs tabular-nums text-ink-4">{i + 1}</div>
@@ -26,8 +26,8 @@ export default function AssetsPage() {
           </li>
         ))}
       </ol>
-      <EmptyState icon={Library} title="No intellectual assets yet" phase={7}>
-        Each asset moves through the pipeline and can be reused in talks, training and consulting.
+      <EmptyState icon={Library} title="لا توجد أصول فكرية بعد" phase={7}>
+        كل أصل يمر بالمسار ويمكن إعادة استخدامه في المحاضرات والتدريب والاستشارات.
       </EmptyState>
     </>
   );

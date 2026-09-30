@@ -4,7 +4,9 @@ import { Target, NotebookPen, Hourglass } from "lucide-react";
 import { Card, Section, SectionTitle } from "@/components/ui/card";
 import { MainWithRail, PageHeader, PeriodNav } from "@/components/ui/page-header";
 import { Planned } from "@/components/ui/planned";
-import { getSettings, listOutcomes, tasksBetween } from "@/db/repo";
+import { getSettings, listOutcomes, routineProgress, tasksBetween } from "@/db/repo";
+import { RoutineProgressList } from "@/components/plan/routine";
+import Link from "next/link";
 import { SYSTEM_START } from "@/lib/config";
 import { beforeStart } from "@/lib/periods";
 import { EventsSection } from "@/components/plan/sections";
@@ -39,6 +41,7 @@ export default async function WeekPage({ params }: Props) {
   const outcomes = listOutcomes(from);
   const weekTasks = tasksBetween(from, to);
   const maxOutcomes = getSettings().capacity.weeklyOutcomes;
+  const progress = routineProgress(from, to);
 
   return (
     <>
@@ -121,6 +124,17 @@ export default async function WeekPage({ params }: Props) {
         }
         rail={
           <>
+            <Section
+              title="الأنظمة المستمرة · هذا الأسبوع"
+              meta={<Link href="/settings/routine" className="hover:text-ink">الجدول ←</Link>}
+            >
+              {progress.length ? (
+                <RoutineProgressList items={progress} />
+              ) : (
+                <p className="text-sm text-ink-3">لا توجد حدود دنيا أسبوعية بعد.</p>
+              )}
+              <p className="mt-4 text-2xs text-ink-4">تمتلئ تلقائيًا من علامات ✓ في جدول اليوم. بلا سلاسل ولا لوم.</p>
+            </Section>
             <EventsSection from={from} to={to} defaultDate={from} title="المواعيد والتواريخ" />
             <Planned title="وقت احتياطي · Buffer" empty="لا يوجد وقت احتياطي محجوز" icon={Hourglass} phase={3}>اتركي مساحة لما لا يُتوقع.</Planned>
             <Planned title="المراجعة الأسبوعية · Weekly Review" meta="الجمعة · ≈ 20 د" empty="تُفتح يوم الجمعة" icon={NotebookPen} phase={3}>

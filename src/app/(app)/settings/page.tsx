@@ -70,6 +70,10 @@ export default function SettingsPage() {
               </a>
               <p className="mt-2 text-xs text-ink-3">ملف JSON بكل خططك وتواريخك. احفظيه في مكان آمن من حين لآخر.</p>
             </Section>
+            <Section title="الجدول اليومي · Routine">
+              <p className="text-sm text-ink-2">يومك من 5:00 إلى 22:00 كقائمة ✓ في صفحة اليوم.</p>
+              <Link href="/settings/routine" className="mt-2 inline-block text-sm text-accent-text underline decoration-accent decoration-2 underline-offset-4">تعديل الجدول ←</Link>
+            </Section>
             <Section title="نظام التصميم">
               <Link href="/system" className="text-sm text-accent-text underline decoration-accent decoration-2 underline-offset-4">عرض الألوان والمكونات ←</Link>
             </Section>

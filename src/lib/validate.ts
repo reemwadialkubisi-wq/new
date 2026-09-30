@@ -126,3 +126,51 @@ export function validateCapture(raw: { kind?: unknown; text?: unknown; date?: un
   if (date && !parseISODate(date)) errors.date = "هذا التاريخ غير صحيح.";
   return Object.keys(errors).length ? { ok: false, errors } : { ok: true, value: { kind, title, note, date } };
 }
+
+export interface RoutineInput {
+  title: string; startTime: string; endTime: string | null; area: string | null; tier: Tier; days: string;
+  weeklyMinimum: number | null; targetCount: number | null; activeFrom: string | null; activeTo: string | null; note: string;
+}
+
+const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
+
+export function validateRoutine(raw: Record<string, unknown> & { days?: unknown[] }): Result<RoutineInput> {
+  const errors: Errors = {};
+  const title = clean(raw.title);
+  const startTime = clean(raw.startTime);
+  const endTime = clean(raw.endTime) || null;
+  const area = clean(raw.area) || null;
+  const tier = (clean(raw.tier) || "should") as Tier;
+  const days = [...new Set((raw.days ?? []).map(clean).filter((d) => /^[0-6]$/.test(d)))].sort().join("");
+  const activeFrom = clean(raw.activeFrom) || null;
+  const activeTo = clean(raw.activeTo) || null;
+  const note = clean(raw.note);
+  const optInt = (name: string, max: number) => {
+    const v = clean(raw[name]);
+    if (!v) return null;
+    const n = Number(v);
+    if (!Number.isInteger(n) || n < 1 || n > max) {
+      errors[name] = `رقم صحيح من 1 إلى ${max}، أو اتركيه فارغًا.`;
+      return null;
+    }
+    return n;
+  };
+  if (!title) errors.title = "اكتبي اسمًا قصيرًا.";
+  else if (title.length > 120) errors.title = tooLong(120);
+  if (!TIME.test(startTime)) errors.startTime = "اكتبي الوقت بصيغة 05:30.";
+  if (endTime && !TIME.test(endTime)) errors.endTime = "اكتبي الوقت بصيغة 05:30.";
+  else if (endTime && !errors.startTime && endTime <= startTime) errors.endTime = "النهاية بعد البداية.";
+  if (area && !AREA_SLUGS.has(area)) errors.area = "اختاري المجال من القائمة.";
+  if (!TIERS.includes(tier)) errors.tier = "اختاري الأولوية من القائمة.";
+  if (!days) errors.days = "اختاري يومًا واحدًا على الأقل.";
+  const weeklyMinimum = optInt("weeklyMinimum", 7);
+  const targetCount = optInt("targetCount", 1000);
+  if (activeFrom && !parseISODate(activeFrom)) errors.activeFrom = "هذا التاريخ غير صحيح.";
+  if (activeTo && !parseISODate(activeTo)) errors.activeTo = "هذا التاريخ غير صحيح.";
+  else if (activeFrom && activeTo && activeTo < activeFrom) errors.activeTo = "النهاية بعد البداية.";
+  if (targetCount && (!activeFrom || !activeTo)) errors.targetCount = "الهدف يحتاج تاريخ بداية ونهاية للدورة.";
+  if (note.length > 200) errors.note = tooLong(200);
+  return Object.keys(errors).length
+    ? { ok: false, errors }
+    : { ok: true, value: { title, startTime, endTime, area, tier, days, weeklyMinimum, targetCount, activeFrom, activeTo, note } };
+}

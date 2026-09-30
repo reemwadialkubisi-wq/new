@@ -99,3 +99,19 @@ describe("system start (Q4 2026)", () => {
     expect(beforeStart("2026-10-02")).toBe(false); // the 26 Sep – 2 Oct week holds 1 Oct
   });
 });
+
+import { validateRoutine } from "./validate";
+
+describe("validateRoutine", () => {
+  const base = { title: "إنجليزي", startTime: "19:30", tier: "should", days: ["1", "0", "9"], weeklyMinimum: "3" };
+  it("accepts an item and cleans the days", () => {
+    expect(validateRoutine(base)).toMatchObject({ ok: true, value: { days: "01", weeklyMinimum: 3, endTime: null, targetCount: null } });
+  });
+  it("checks times, days and cycle dates", () => {
+    const r = validateRoutine({ ...base, startTime: "7pm", endTime: "", days: [], targetCount: "90" });
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(Object.keys(r.errors).sort()).toEqual(["days", "startTime", "targetCount"]);
+    const r2 = validateRoutine({ ...base, endTime: "19:00" });
+    expect(r2.ok).toBe(false);
+  });
+});

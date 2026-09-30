@@ -5,7 +5,7 @@ import { migrate } from "drizzle-orm/better-sqlite3/migrator";
 import { mkdirSync } from "node:fs";
 import path from "node:path";
 import * as schema from "./schema";
-import { seed } from "./seed";
+import { seed, seedRoutine } from "./seed";
 
 export type DB = BetterSQLite3Database<typeof schema>;
 
@@ -27,6 +27,7 @@ export function getDb(): DB {
   const db = drizzle(sqlite, { schema });
   migrate(db, { migrationsFolder: path.join(process.cwd(), "drizzle") });
   seed(db);
+  seedRoutine(db);
   g.__reemDb = db;
   return db;
 }

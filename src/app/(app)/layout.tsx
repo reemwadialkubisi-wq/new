@@ -3,6 +3,7 @@ import { TimeBar } from "@/components/shell/time-bar";
 import { BottomBar } from "@/components/shell/mobile-nav";
 import { QuickCaptureProvider } from "@/components/shell/quick-capture";
 import { authConfigured } from "@/lib/config";
+import { getEnergy } from "@/db/repo";
 import { toISODate } from "@/lib/time/calendar";
 import { currentPeriods } from "@/lib/time/current";
 
@@ -27,7 +28,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               month: { ...now.month, theme: null },
               week: now.week,
               day: now.day,
-              energy: null,
+              energy: getEnergy(toISODate(now.today)),
             }}
           />
           <main id="main" className="mx-auto w-full max-w-[1200px] px-4 pb-28 pt-8 sm:px-8 sm:pt-10 md:pb-16 lg:px-10">

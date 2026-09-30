@@ -1,13 +1,13 @@
 import "server-only";
-import { and, asc, desc, eq, gte, inArray, isNull, lt, lte, or } from "drizzle-orm";
+import { and, asc, count, desc, eq, gte, inArray, isNull, lt, lte, or } from "drizzle-orm";
 import { DEFAULT_SETTINGS, type AppSettings } from "@/lib/config";
 import type { PeriodRef } from "@/lib/periods";
 import type { Weekday } from "@/lib/time/calendar";
-import type { EventInput, FocusInput, PlanInput, SettingsInput } from "@/lib/validate";
+import type { EventInput, FocusInput, PlanInput, RoutineInput, SettingsInput } from "@/lib/validate";
 import { getDb } from "./index";
 import {
-  areaFocus, events, ideas, periodPlans, settings, tasks, weeklyOutcomes,
-  type Event, type OutcomeStatus, type PeriodPlan, type PlanLevel, type TaskStatus,
+  areaFocus, dayLogs, events, ideas, periodPlans, routineChecks, routineItems, settings, tasks, weeklyOutcomes,
+  type EnergyLevel, type Event, type RoutineItem, type OutcomeStatus, type PeriodPlan, type PlanLevel, type TaskStatus,
 } from "./schema";
 
 const now = () => new Date().toISOString().slice(0, 19).replace("T", " ");
@@ -200,6 +200,83 @@ export function archiveOutcome(id: number) {
   getDb().update(weeklyOutcomes).set({ archivedAt: now(), updatedAt: now() }).where(eq(weeklyOutcomes.id, id)).run();
 }
 
+/* Daily routine */
+
+export function listRoutine(): RoutineItem[] {
+  return getDb().select().from(routineItems).where(isNull(routineItems.archivedAt)).orderBy(asc(routineItems.startTime), asc(routineItems.id)).all();
+}
+
+export function saveRoutineItem(id: number | null, v: RoutineInput) {
+  const db = getDb();
+  if (id) db.update(routineItems).set({ ...v, updatedAt: now() }).where(eq(routineItems.id, id)).run();
+  else db.insert(routineItems).values(v).run();
+}
+
+export function archiveRoutineItem(id: number) {
+  getDb().update(routineItems).set({ archivedAt: now(), updatedAt: now() }).where(eq(routineItems.id, id)).run();
+}
+
+export function setRoutineCheck(itemId: number, date: string, done: boolean) {
+  const db = getDb();
+  if (done) db.insert(routineChecks).values({ itemId, date }).onConflictDoNothing().run();
+  else db.delete(routineChecks).where(and(eq(routineChecks.itemId, itemId), eq(routineChecks.date, date))).run();
+}
+
+function checksBetween(itemId: number, from: string, to: string) {
+  return getDb()
+    .select({ n: count() })
+    .from(routineChecks)
+    .where(and(eq(routineChecks.itemId, itemId), gte(routineChecks.date, from), lte(routineChecks.date, to)))
+    .get()!.n;
+}
+
+export interface RoutineProgress {
+  item: RoutineItem;
+  /** Ticks this planning week, for items with a weekly minimum. */
+  week: number | null;
+  /** Ticks in the item's cycle so far, for items with a target (e.g. 90 readings). */
+  cycle: number | null;
+}
+
+const inCycle = (i: RoutineItem, day: string) => (!i.activeFrom || day >= i.activeFrom) && (!i.activeTo || day <= i.activeTo);
+
+function progressOf(i: RoutineItem, weekFrom: string, weekTo: string): RoutineProgress {
+  return {
+    item: i,
+    week: i.weeklyMinimum ? checksBetween(i.id, weekFrom, weekTo) : null,
+    cycle: i.targetCount && i.activeFrom && i.activeTo ? checksBetween(i.id, i.activeFrom, i.activeTo) : null,
+  };
+}
+
+/** The day's checklist: items scheduled on that weekday and inside their cycle, with ticks and counters. */
+export function routineForDay(day: string, weekFrom: string, weekTo: string) {
+  const weekday = String(new Date(`${day}T00:00:00Z`).getUTCDay());
+  const checked = new Set(
+    getDb().select({ itemId: routineChecks.itemId }).from(routineChecks).where(eq(routineChecks.date, day)).all().map((r) => r.itemId),
+  );
+  return listRoutine()
+    .filter((i) => i.days.includes(weekday) && inCycle(i, day))
+    .map((i) => ({ ...progressOf(i, weekFrom, weekTo), done: checked.has(i.id) }));
+}
+
+/** Weekly minimums and cycle targets for the week page. */
+export function routineProgress(weekFrom: string, weekTo: string): RoutineProgress[] {
+  return listRoutine()
+    .filter((i) => i.weeklyMinimum || i.targetCount)
+    .filter((i) => !i.activeTo || i.activeTo >= weekFrom)
+    .map((i) => progressOf(i, weekFrom, weekTo));
+}
+
+/* Energy (one per day) */
+
+export function getEnergy(day: string): EnergyLevel | null {
+  return getDb().select().from(dayLogs).where(eq(dayLogs.date, day)).get()?.energy ?? null;
+}
+
+export function setEnergy(day: string, energy: EnergyLevel) {
+  getDb().insert(dayLogs).values({ date: day, energy }).onConflictDoUpdate({ target: dayLogs.date, set: { energy, updatedAt: now() } }).run();
+}
+
 /* Backup */
 
 export function exportAll() {
@@ -214,5 +291,8 @@ export function exportAll() {
     ideas: db.select().from(ideas).all(),
     tasks: db.select().from(tasks).all(),
     weeklyOutcomes: db.select().from(weeklyOutcomes).all(),
+    routineItems: db.select().from(routineItems).all(),
+    routineChecks: db.select().from(routineChecks).all(),
+    dayLogs: db.select().from(dayLogs).all(),
   };
 }

@@ -98,3 +98,48 @@ describe("quick capture destinations", () => {
     expect(listOutcomes("2030-01-05")).toMatchObject([{ title: "مسودة", status: "achieved" }]);
   });
 });
+
+import { getEnergy, listRoutine, routineForDay, routineProgress, saveRoutineItem, setEnergy, setRoutineCheck } from "./repo";
+
+describe("daily routine", () => {
+  it("is seeded from 5:00 to 22:00, with Al-Baqarah as a 90-reading cycle", () => {
+    const items = listRoutine();
+    expect(items[0]).toMatchObject({ startTime: "05:00" });
+    expect(items.at(-1)).toMatchObject({ startTime: "22:00" });
+    expect(items.find((i) => i.title === "سورة البقرة")).toMatchObject({ targetCount: 90, activeFrom: "2026-10-01" });
+  });
+  it("shows only the weekday's items (work Sunday to Thursday, review on Friday)", () => {
+    const fri = routineForDay("2026-10-09", "2026-10-03", "2026-10-09").map((i) => i.item.title);
+    expect(fri).toContain("المراجعة الأسبوعية");
+    expect(fri).not.toContain("العمل");
+    const sun = routineForDay("2026-10-04", "2026-10-03", "2026-10-09").map((i) => i.item.title);
+    expect(sun).toContain("العمل");
+    expect(sun).not.toContain("المراجعة الأسبوعية");
+  });
+  it("one tick feeds the weekly minimum and the cycle; unticking takes it back", () => {
+    const eng = listRoutine().find((i) => i.title.startsWith("إنجليزي"))!;
+    const baq = listRoutine().find((i) => i.title === "سورة البقرة")!;
+    for (const d of ["2026-10-03", "2026-10-04"]) {
+      setRoutineCheck(eng.id, d, true);
+      setRoutineCheck(baq.id, d, true);
+    }
+    setRoutineCheck(eng.id, "2026-10-04", true); // twice the same day counts once
+    const day = routineForDay("2026-10-04", "2026-10-03", "2026-10-09");
+    expect(day.find((i) => i.item.id === eng.id)).toMatchObject({ done: true, week: 2 });
+    expect(day.find((i) => i.item.id === baq.id)).toMatchObject({ done: true, cycle: 2 });
+    setRoutineCheck(eng.id, "2026-10-04", false);
+    expect(routineProgress("2026-10-03", "2026-10-09").find((p) => p.item.id === eng.id)?.week).toBe(1);
+    expect(routineForDay("2026-09-30", "2026-09-26", "2026-10-02").find((i) => i.item.id === baq.id)).toBeUndefined(); // before its cycle
+  });
+  it("items can be edited", () => {
+    const eng = listRoutine().find((i) => i.title.startsWith("إنجليزي"))!;
+    saveRoutineItem(eng.id, { ...eng, startTime: "20:00" });
+    expect(listRoutine().find((i) => i.id === eng.id)?.startTime).toBe("20:00");
+  });
+  it("energy is one per day and can change", () => {
+    setEnergy("2026-10-05", "YELLOW");
+    setEnergy("2026-10-05", "RED");
+    expect(getEnergy("2026-10-05")).toBe("RED");
+    expect(getEnergy("2026-10-06")).toBeNull();
+  });
+});

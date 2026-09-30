@@ -162,3 +162,76 @@ export function SettingsForm({
     </ActionForm>
   );
 }
+
+const WEEKDAY_SHORT = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+const WEEK_ORDER = [6, 0, 1, 2, 3, 4, 5]; // Saturday first
+
+export interface RoutineFormValues {
+  title: string; startTime: string; endTime: string | null; area: string | null; tier: string; days: string;
+  weeklyMinimum: number | null; targetCount: number | null; activeFrom: string | null; activeTo: string | null; note: string;
+}
+
+export function RoutineForm({ action, initial, submitLabel }: { action: Action; initial?: RoutineFormValues; submitLabel?: string }) {
+  const v = initial ?? { title: "", startTime: "", endTime: null, area: null, tier: "should", days: "0123456", weeklyMinimum: null, targetCount: null, activeFrom: null, activeTo: null, note: "" };
+  return (
+    <ActionForm action={action} submitLabel={submitLabel} resetOnSave={!initial}>
+      <div className="grid grid-cols-1 gap-4 @md:grid-cols-[1fr_7rem_7rem]">
+        <FormField name="title" label="البند">
+          <Input name="title" defaultValue={v.title} maxLength={160} />
+        </FormField>
+        <FormField name="startTime" label="من">
+          <Input name="startTime" type="time" dir="ltr" defaultValue={v.startTime} />
+        </FormField>
+        <FormField name="endTime" label="إلى (اختياري)">
+          <Input name="endTime" type="time" dir="ltr" defaultValue={v.endTime ?? ""} />
+        </FormField>
+      </div>
+      <div className="grid grid-cols-1 gap-4 @md:grid-cols-2">
+        <FormField name="area" label="يُحسب في مجال">
+          <Select name="area" defaultValue={v.area ?? ""}>
+            <option value="">بدون</option>
+            {LIFE_AREAS.map((a) => (
+              <option key={a.slug} value={a.slug}>{a.name}</option>
+            ))}
+          </Select>
+        </FormField>
+        <FormField name="tier" label="الأولوية" hint="YELLOW يخفي «ممكن»، وRED يبقي «ضروري» فقط.">
+          <Select name="tier" defaultValue={v.tier}>
+            {Object.entries(TIER_LABELS).map(([k, l]) => (
+              <option key={k} value={k}>{l}</option>
+            ))}
+          </Select>
+        </FormField>
+      </div>
+      <fieldset>
+        <legend className="mb-1.5 text-xs font-medium text-ink-2">الأيام</legend>
+        <div className="flex flex-wrap gap-x-4 gap-y-2">
+          {WEEK_ORDER.map((d) => (
+            <label key={d} className="flex items-center gap-1.5 text-sm text-ink-2">
+              <input type="checkbox" name="days" value={d} defaultChecked={v.days.includes(String(d))} className="size-4 accent-[var(--pink)]" />
+              {WEEKDAY_SHORT[d]}
+            </label>
+          ))}
+        </div>
+        <FieldError name="days" />
+      </fieldset>
+      <div className="grid grid-cols-2 gap-4 @xl:grid-cols-4">
+        <FormField name="weeklyMinimum" label="حد أدنى أسبوعي" hint="مثال: 3">
+          <Input name="weeklyMinimum" type="number" inputMode="numeric" min={1} max={7} dir="ltr" defaultValue={v.weeklyMinimum ?? ""} />
+        </FormField>
+        <FormField name="targetCount" label="هدف الدورة" hint="مثال: 90 قراءة">
+          <Input name="targetCount" type="number" inputMode="numeric" min={1} max={1000} dir="ltr" defaultValue={v.targetCount ?? ""} />
+        </FormField>
+        <FormField name="activeFrom" label="تبدأ">
+          <Input name="activeFrom" type="date" dir="ltr" defaultValue={v.activeFrom ?? ""} />
+        </FormField>
+        <FormField name="activeTo" label="تنتهي">
+          <Input name="activeTo" type="date" dir="ltr" defaultValue={v.activeTo ?? ""} />
+        </FormField>
+      </div>
+      <FormField name="note" label="ملاحظة (اختياري)">
+        <Input name="note" defaultValue={v.note} maxLength={240} />
+      </FormField>
+    </ActionForm>
+  );
+}

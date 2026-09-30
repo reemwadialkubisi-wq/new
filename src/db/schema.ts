@@ -158,3 +158,50 @@ export const weeklyOutcomes = sqliteTable(
 export type Idea = typeof ideas.$inferSelect;
 export type Task = typeof tasks.$inferSelect;
 export type WeeklyOutcome = typeof weeklyOutcomes.$inferSelect;
+
+/* Daily routine (Reem, 30 Sep 2026): her day from 5:00 to 22:00 as a checklist. Ticking an item
+   records it (routine_checks), and that one tick feeds its weekly minimum and its cycle target,
+   so nothing is logged twice. This is the Phase 0 Routine + Habit + HabitCheck in one place. */
+
+export const routineItems = sqliteTable("routine_items", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  title: text("title").notNull(),
+  startTime: text("start_time").notNull(), // "HH:MM", 24-hour
+  endTime: text("end_time"),
+  area: text("area"),
+  tier: text("tier", { enum: TIERS }).notNull().default("should"),
+  /** Weekdays it appears on, as digits 0 (Sunday) … 6 (Saturday). */
+  days: text("days").notNull().default("0123456"),
+  /** e.g. English 3 × a week. Counted per planning week, never as a streak. */
+  weeklyMinimum: integer("weekly_minimum"),
+  /** e.g. Al-Baqarah: 90 readings between activeFrom and activeTo. */
+  targetCount: integer("target_count"),
+  activeFrom: text("active_from"),
+  activeTo: text("active_to"),
+  note: text("note").notNull().default(""),
+  ...timestamps,
+  archivedAt: text("archived_at"),
+});
+
+export const routineChecks = sqliteTable(
+  "routine_checks",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    itemId: integer("item_id").notNull().references(() => routineItems.id, { onDelete: "cascade" }),
+    date: text("date").notNull(),
+    createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
+  },
+  (t) => [uniqueIndex("routine_checks_item_date").on(t.itemId, t.date)],
+);
+
+export const ENERGIES = ["GREEN", "YELLOW", "RED"] as const;
+export type EnergyLevel = (typeof ENERGIES)[number];
+
+/** One row per day: the energy level chosen that morning. */
+export const dayLogs = sqliteTable("day_logs", {
+  date: text("date").primaryKey(),
+  energy: text("energy", { enum: ENERGIES }),
+  ...timestamps,
+});
+
+export type RoutineItem = typeof routineItems.$inferSelect;

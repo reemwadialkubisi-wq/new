@@ -3,13 +3,15 @@
 import { revalidatePath } from "next/cache";
 import {
   addEvent, addIdea, addOutcome, addTask, archiveEvent, archiveIdea, archiveOutcome, archiveTask,
-  getSettings, listOutcomes, saveFocus, savePlan, saveSettings, setOutcomeStatus, setTaskStatus,
+  archiveRoutineItem, getSettings, listOutcomes, saveFocus, savePlan, saveRoutineItem, saveSettings,
+  setEnergy, setOutcomeStatus, setRoutineCheck, setTaskStatus,
 } from "@/db/repo";
+import { ENERGIES, type EnergyLevel } from "@/db/schema";
 import type { PlanLevel } from "@/db/schema";
 import { LIFE_AREAS } from "@/lib/areas";
 import { periodRef } from "@/lib/periods";
 import { formatDateAr, parseISODate, startOfWeek, todayIn, toISODate } from "@/lib/time/calendar";
-import { validateCapture, validateEvent, validateFocus, validatePlan, validateSettings, type Errors } from "@/lib/validate";
+import { validateCapture, validateEvent, validateFocus, validatePlan, validateRoutine, validateSettings, type Errors } from "@/lib/validate";
 
 export interface FormState {
   ok?: boolean;
@@ -149,5 +151,36 @@ export async function archiveOutcomeAction(form: FormData) {
 export async function archiveIdeaAction(form: FormData) {
   const id = idOf(form);
   if (id) archiveIdea(id);
+  revalidatePath("/", "layout");
+}
+
+/* Daily routine and energy */
+
+const isDay = (v: FormDataEntryValue | null): v is string => typeof v === "string" && parseISODate(v) !== null;
+
+export async function toggleRoutineAction(form: FormData) {
+  const id = idOf(form);
+  const date = form.get("date");
+  if (id && isDay(date)) setRoutineCheck(id, date, form.get("done") === "1");
+  revalidatePath("/", "layout");
+}
+
+export async function setEnergyAction(form: FormData) {
+  const date = form.get("date");
+  const energy = form.get("energy") as EnergyLevel;
+  if (isDay(date) && ENERGIES.includes(energy)) setEnergy(date, energy);
+  revalidatePath("/", "layout");
+}
+
+export async function saveRoutineAction(id: number | null, _prev: FormState, form: FormData): Promise<FormState> {
+  const result = validateRoutine({ ...Object.fromEntries(form), days: form.getAll("days") });
+  if (!result.ok) return { errors: result.errors };
+  saveRoutineItem(id, result.value);
+  return done();
+}
+
+export async function archiveRoutineAction(form: FormData) {
+  const id = idOf(form);
+  if (id) archiveRoutineItem(id);
   revalidatePath("/", "layout");
 }

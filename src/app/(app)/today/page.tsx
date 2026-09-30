@@ -1,17 +1,16 @@
 import type { Metadata } from "next";
-import { CheckSquare, Repeat, Sparkles, MoonStar } from "lucide-react";
+import { CheckSquare, Sparkles, MoonStar } from "lucide-react";
 import { Card, Section, SectionTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { CaptureButton } from "@/components/shell/capture-button";
 import { EventsSection } from "@/components/plan/sections";
 import { TaskList } from "@/components/plan/items";
-import { tasksForDay } from "@/db/repo";
+import { getEnergy, routineForDay, tasksForDay } from "@/db/repo";
+import { DailyRoutine, EnergyPicker } from "@/components/plan/routine";
 import { MainWithRail, PageHeader } from "@/components/ui/page-header";
-import { ENERGY, type Energy } from "@/components/ui/status";
 import { Planned } from "@/components/ui/planned";
 import { formatDayLongAr, toISODate } from "@/lib/time/calendar";
 import { currentPeriods } from "@/lib/time/current";
-import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "اليوم" };
 
@@ -25,6 +24,8 @@ export default function TodayPage() {
   const now = currentPeriods();
   const day = toISODate(now.today);
   const t = tasksForDay(day);
+  const energy = getEnergy(day);
+  const routine = routineForDay(day, toISODate(now.week.info.start), toISODate(now.week.info.end));
   const none = !t.today.length && !t.undated.length && !t.earlier.length;
   return (
     <>
@@ -37,21 +38,8 @@ export default function TodayPage() {
       <MainWithRail
         main={
           <>
-            <Card className="p-6">
-              <SectionTitle meta="الخطوة 1">كيف طاقتك اليوم؟ · Energy</SectionTitle>
-              <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
-                {(Object.keys(ENERGY) as Energy[]).map((level) => (
-                  <div key={level} className="rounded-md border border-border px-4 py-3">
-                    <span className="flex items-center gap-2 text-xs font-semibold tracking-wide text-ink">
-                      <span className={cn("size-2 rounded-full", ENERGY[level].dot)} aria-hidden />
-                      {level}
-                    </span>
-                    <span className="mt-1 block text-xs text-ink-3">{ENERGY[level].meaning}</span>
-                  </div>
-                ))}
-              </div>
-              <p className="mt-3 text-2xs text-ink-4">اختيار الطاقة يأتي في المرحلة 3</p>
-            </Card>
+            <EnergyPicker day={day} energy={energy} />
+            <DailyRoutine day={day} items={routine} energy={energy} />
             <Card className="p-6">
               <SectionTitle meta="الخطوة 2">أهم 3 لليوم · Big 3</SectionTitle>
               <ol className="mt-3 divide-y divide-border">
@@ -97,7 +85,6 @@ export default function TodayPage() {
         }
         rail={
           <>
-            <Planned title="الروتين · Routine" empty="لا يوجد روتين بعد" icon={Repeat} phase={5}>روتين الصباح والمساء كخطوات بسيطة.</Planned>
             <EventsSection from={day} to={day} defaultDate={day} title="المواعيد والتواريخ · Today" />
             <Planned title="إغلاق اليوم · Daily Checkout" meta="≤ 2 د" empty="أغلقي اليوم بهدوء" icon={MoonStar} phase={3}>
               تم · تخطٍّ بلا لوم · نقل بقصد · إيقاف مؤقت.

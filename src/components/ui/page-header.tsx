@@ -33,12 +33,19 @@ export function PageHeader({
 }
 
 /** Previous / next period arrows used on every time-based page. */
-export function PeriodNav({ prev, next, current }: { prev: string; next: string; current?: string }) {
+/** Previous / current / next. Without `prev` (the first period of the system) the back arrow is shown disabled. */
+export function PeriodNav({ prev, next, current }: { prev?: string; next: string; current?: string }) {
   const cls =
     "inline-flex size-9 items-center justify-center rounded-md border border-border-strong bg-surface text-ink-2 hover:bg-surface-2 hover:text-ink";
   return (
     <nav className="flex items-center gap-2" aria-label="التنقل بين الفترات">
-      <Link href={prev} className={cls} aria-label="الفترة السابقة"><ChevronRight className="size-4" /></Link>
+      {prev ? (
+        <Link href={prev} className={cls} aria-label="الفترة السابقة"><ChevronRight className="size-4" /></Link>
+      ) : (
+        <span className={`${cls} pointer-events-none opacity-35`} aria-disabled="true" title="بداية النظام: الربع الرابع 2026">
+          <ChevronRight className="size-4" aria-hidden />
+        </span>
+      )}
       {current ? (
         <Link href={current} className="inline-flex h-9 items-center rounded-md px-3 text-xs font-medium text-ink-2 hover:bg-surface-2">
           الحالي

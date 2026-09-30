@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Flag, FolderKanban, NotebookPen, Target } from "lucide-react";
 import { MainWithRail, PageHeader, PeriodNav } from "@/components/ui/page-header";
 import { Planned } from "@/components/ui/planned";
 import { EventsSection, FocusSection, PlanSection } from "@/components/plan/sections";
 import { getPlan, getPlans, getSettings } from "@/db/repo";
-import { periodRef } from "@/lib/periods";
+import { START_HREF, beforeStart, periodRef } from "@/lib/periods";
 import { MONTHS_AR, monthKey, parseQuarterKey, quarterKey, shiftQuarter, weeksOfMonth } from "@/lib/time/calendar";
 import { currentPeriods } from "@/lib/time/current";
 import { cn } from "@/lib/utils";
@@ -21,6 +21,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function QuarterPage({ params }: Props) {
   const ref = periodRef("quarter", (await params).key);
   if (!ref) notFound();
+  if (beforeStart(ref.endDate)) redirect(START_HREF.quarter);
   const { year } = ref;
   const quarter = ref.quarter!;
   const settings = getSettings();
@@ -40,7 +41,7 @@ export default async function QuarterPage({ params }: Props) {
         title={`الربع ${quarter} · ${year}`}
         english={`Q${quarter}`}
         subtitle={`${MONTHS_AR[months[0]]} – ${MONTHS_AR[months[2]]} · ${plan?.theme || "لم يُحدد عنوان الربع بعد"}`}
-        action={<PeriodNav prev={`/quarter/${quarterKey(prev.year, prev.quarter)}`} next={`/quarter/${quarterKey(next.year, next.quarter)}`} current={now.quarter.href} />}
+        action={<PeriodNav prev={beforeStart(periodRef("quarter", quarterKey(prev.year, prev.quarter))!.endDate) ? undefined : `/quarter/${quarterKey(prev.year, prev.quarter)}`} next={`/quarter/${quarterKey(next.year, next.quarter)}`} current={now.quarter.href} />}
       />
       <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3" data-testid="months">
         {months.map((m) => {

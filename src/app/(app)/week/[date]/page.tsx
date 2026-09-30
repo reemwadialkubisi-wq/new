@@ -5,12 +5,14 @@ import { Card, Section, SectionTitle } from "@/components/ui/card";
 import { MainWithRail, PageHeader, PeriodNav } from "@/components/ui/page-header";
 import { Planned } from "@/components/ui/planned";
 import { getSettings, listOutcomes, tasksBetween } from "@/db/repo";
+import { SYSTEM_START } from "@/lib/config";
+import { beforeStart } from "@/lib/periods";
 import { EventsSection } from "@/components/plan/sections";
 import { OutcomeList, TaskList } from "@/components/plan/items";
 import { EmptyState } from "@/components/ui/empty-state";
 import { CaptureButton } from "@/components/shell/capture-button";
 import {
-  MONTHS_AR, WEEKDAYS_AR, addDays, formatRangeAr, parseISODate, sameDay, toISODate, weekInfo,
+  MONTHS_AR, WEEKDAYS_AR, addDays, formatRangeAr, parseISODate, sameDay, startOfWeek, toISODate, weekInfo,
 } from "@/lib/time/calendar";
 import { currentPeriods } from "@/lib/time/current";
 import { cn } from "@/lib/utils";
@@ -28,6 +30,7 @@ export default async function WeekPage({ params }: Props) {
   const d = parseISODate((await params).date);
   if (!d) notFound();
   const w = weekInfo(d, getSettings().weekStart);
+  if (beforeStart(toISODate(w.end))) redirect(`/week/${toISODate(startOfWeek(parseISODate(SYSTEM_START.date)!, getSettings().weekStart))}`);
   if (!sameDay(w.start, d)) redirect(`/week/${toISODate(w.start)}`);
   const now = currentPeriods();
   const days = Array.from({ length: 7 }, (_, i) => addDays(w.start, i));
@@ -51,7 +54,7 @@ export default async function WeekPage({ params }: Props) {
         }
         action={
           <PeriodNav
-            prev={`/week/${toISODate(addDays(w.start, -7))}`}
+            prev={beforeStart(toISODate(addDays(w.start, -1))) ? undefined : `/week/${toISODate(addDays(w.start, -7))}`}
             next={`/week/${toISODate(addDays(w.start, 7))}`}
             current={now.week.href}
           />

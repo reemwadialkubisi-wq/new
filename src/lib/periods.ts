@@ -1,3 +1,4 @@
+import { SYSTEM_START } from "./config";
 import { day, parseMonthKey, parseQuarterKey, parseYear, toISODate } from "./time/calendar";
 import type { PlanLevel } from "@/db/schema";
 
@@ -37,3 +38,15 @@ export function periodRef(level: PlanLevel, key: string): PeriodRef | null {
     endDate: toISODate(day(m.year, m.month + 1, 0)),
   };
 }
+
+/** True when the whole period ends before the system starts (Q4 2026). */
+export function beforeStart(endDate: string) {
+  return endDate < SYSTEM_START.date;
+}
+
+/** The first period of a level: where earlier URLs are sent. */
+export const START_HREF = {
+  year: `/year/${SYSTEM_START.year}`,
+  quarter: `/quarter/${SYSTEM_START.quarterKey}`,
+  month: `/month/${SYSTEM_START.monthKey}`,
+} as const;

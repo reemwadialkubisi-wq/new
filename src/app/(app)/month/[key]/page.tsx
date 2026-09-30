@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Flag, NotebookPen, Wallet } from "lucide-react";
 import { Section } from "@/components/ui/card";
 import { MainWithRail, PageHeader, PeriodNav } from "@/components/ui/page-header";
 import { Planned } from "@/components/ui/planned";
 import { EventsSection, FocusSection, PlanSection } from "@/components/plan/sections";
 import { getPlan, getSettings } from "@/db/repo";
-import { periodRef } from "@/lib/periods";
+import { START_HREF, beforeStart, periodRef } from "@/lib/periods";
 import { MONTHS, MONTHS_AR, formatRangeAr, monthKey, parseMonthKey, quarterOfMonth, sameDay, shiftMonth, toISODate, weeksOfMonth } from "@/lib/time/calendar";
 import { currentPeriods } from "@/lib/time/current";
 import { cn } from "@/lib/utils";
@@ -24,6 +24,7 @@ export default async function MonthPage({ params }: Props) {
   const m = parseMonthKey(key);
   const ref = periodRef("month", key);
   if (!m || !ref) notFound();
+  if (beforeStart(ref.endDate)) redirect(START_HREF.month);
   const settings = getSettings();
   const now = currentPeriods(undefined, settings);
   const archive = m.year < now.today.getUTCFullYear();
@@ -40,7 +41,7 @@ export default async function MonthPage({ params }: Props) {
         title={`${MONTHS_AR[m.month]} ${m.year}`}
         english={MONTHS[m.month]}
         subtitle={`${weeks.length} أسابيع تخطيط · ${plan?.theme || "لم يُحدد عنوان الشهر بعد"}`}
-        action={<PeriodNav prev={`/month/${monthKey(prev.year, prev.month)}`} next={`/month/${monthKey(next.year, next.month)}`} current={now.month.href} />}
+        action={<PeriodNav prev={beforeStart(periodRef("month", monthKey(prev.year, prev.month))!.endDate) ? undefined : `/month/${monthKey(prev.year, prev.month)}`} next={`/month/${monthKey(next.year, next.month)}`} current={now.month.href} />}
       />
       <MainWithRail
         main={

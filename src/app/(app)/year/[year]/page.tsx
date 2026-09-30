@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Flag, FolderKanban, NotebookPen, Target } from "lucide-react";
 import { MainWithRail, PageHeader, PeriodNav } from "@/components/ui/page-header";
 import { Planned } from "@/components/ui/planned";
 import { EventsSection, FocusSection, PlanSection } from "@/components/plan/sections";
 import { PLAN_STATUS_LABELS } from "@/components/plan/labels";
 import { getPlan, getPlans, plannedYears } from "@/db/repo";
-import { periodRef } from "@/lib/periods";
+import { SYSTEM_START } from "@/lib/config";
+import { START_HREF, beforeStart, periodRef } from "@/lib/periods";
 import { MONTHS_AR, quarterKey } from "@/lib/time/calendar";
 import { currentPeriods } from "@/lib/time/current";
 import { cn } from "@/lib/utils";
@@ -21,11 +22,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function YearPage({ params }: Props) {
   const ref = periodRef("year", (await params).year);
   if (!ref) notFound();
+  if (beforeStart(ref.endDate)) redirect(START_HREF.year);
   const year = ref.year;
   const now = currentPeriods();
   const thisYear = now.today.getUTCFullYear();
   const archive = year < thisYear;
-  const years = [...new Set([thisYear - 1, thisYear, thisYear + 1, thisYear + 2, ...plannedYears()])].sort();
+  const years = [...new Set([thisYear - 1, thisYear, thisYear + 1, thisYear + 2, ...plannedYears()])]
+    .filter((y) => y >= SYSTEM_START.year)
+    .sort();
   const plan = getPlan("year", ref.key);
   const quarters = getPlans([1, 2, 3, 4].map((q) => quarterKey(year, q)));
 
@@ -36,7 +40,7 @@ export default async function YearPage({ params }: Props) {
         title={`الخطة السنوية ${year}`}
         english="Annual Plan"
         subtitle={plan?.theme || "لم يُحدد عنوان السنة بعد"}
-        action={<PeriodNav prev={`/year/${year - 1}`} next={`/year/${year + 1}`} current={now.year.href} />}
+        action={<PeriodNav prev={year - 1 >= SYSTEM_START.year ? `/year/${year - 1}` : undefined} next={`/year/${year + 1}`} current={now.year.href} />}
       />
       <nav aria-label="السنوات" className="mb-6 flex flex-wrap gap-1.5">
         {years.map((y) => (
@@ -58,6 +62,17 @@ export default async function YearPage({ params }: Props) {
         {[1, 2, 3, 4].map((q) => {
           const qp = quarters.get(quarterKey(year, q));
           const current = year === thisYear && q === now.quarter.number;
+          if (beforeStart(periodRef("quarter", quarterKey(year, q))!.endDate)) {
+            return (
+              <div key={q} className="flex min-h-24 flex-col rounded-lg border border-dashed border-border px-5 py-4 opacity-60">
+                <div className="flex items-baseline justify-between gap-2">
+                  <span className="text-base font-medium text-ink-3">Q{q}</span>
+                  <span className="text-2xs text-ink-4">{MONTHS_AR[(q - 1) * 3]} – {MONTHS_AR[(q - 1) * 3 + 2]}</span>
+                </div>
+                <span className="mt-2 text-xs text-ink-4">قبل بداية النظام</span>
+              </div>
+            );
+          }
           return (
             <Link
               key={q}

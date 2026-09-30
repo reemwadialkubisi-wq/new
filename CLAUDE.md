@@ -38,6 +38,7 @@ Phases: 0 Product Architecture (done) · 1 Design System & App Shell (approved 3
 - Weeks start **Saturday**, end Friday (Friday = rest + weekly review). Configurable later.
 - A week belongs to the month/quarter/year of its **4th day**, so months have 4 or 5 weeks and no week appears twice. Week 1 = first week whose 4th day is in the new year.
 - Check: Q4 2026 → Oct W40–W43 (3–30 Oct), Nov W44–W47 (31 Oct–27 Nov), Dec W48–W52 (28 Nov–1 Jan). 1–2 Oct 2026 are in the 26 Sep–2 Oct bridge week (September, Q3).
+- **The system starts with Q4 2026 (1 Oct 2026)** (Reem, 30 Sep 2026: no 2025 archive). `SYSTEM_START` in `src/lib/config.ts`. Earlier year/quarter/month/week URLs redirect to the first period of their level, the year selector starts at 2026, Q1–Q3 2026 show as «قبل بداية النظام», and the back arrow is disabled on the first period. The archive rule (past years read-only) applies from 2027 on.
 - "Today" is computed in `APP_TIMEZONE` (default `Asia/Riyadh`, assumed, not yet confirmed by Reem). Dates are UTC-midnight `Date`s so server/browser time zones never matter.
 
 **Product rules.**
@@ -103,7 +104,7 @@ tests/e2e/                   Playwright specs; src/**/*.test.ts Vitest
 
 **Phase 2 (built 30 Sep 2026, awaiting Reem's approval):**
 - Local SQLite database, created automatically on first run; migrations run on startup. A fresh database is seeded with the Q4 2026 plan (quarter theme, 4 priorities, area focus, Oct/Nov/Dec themes, 2 important dates). `REEM_SEED=off` skips it.
-- Year page: theme, vision, top priorities (≤5), status, area focus, important dates, Q1–Q4 cards with their themes, year selector (includes any year with a plan). Past years are a read-only archive.
+- Year page: theme, vision, top priorities (≤5), status, area focus, important dates, Q1–Q4 cards with their themes, year selector from 2026 (includes any year with a plan). Past years (from 2027 on) are a read-only archive; nothing before Q4 2026 exists.
 - Quarter page: theme, intention, priorities (≤5; become Objectives linked to goals in Phase 4), area focus, important dates, month cards with themes and week counts.
 - Month page: theme, intention, top outcomes (≤5), real 4/5 weeks, important dates, area focus.
 - Important Dates (Event): important date / deadline / travel / appointment, optional end date, optional yearly repeat, optional life area. Hiding archives (never deletes).
@@ -111,7 +112,7 @@ tests/e2e/                   Playwright specs; src/**/*.test.ts Vitest
 - Plans, focus and events are edited in place (Edit button on each card). Errors are in Arabic and keep what was typed.
 - **Quick Capture saves (brought forward from Phase 3 at Reem's request, 30 Sep 2026).** Ctrl/⌘K → Idea (default) goes to the one Idea Inbox on `/ideas` (first line = title, other lines = note); Task goes to a chosen day (default today) or no day, shown on `/today` (today, «بلا تاريخ», and earlier ones still open, never called overdue) and on the week page; Outcome goes to this week's Weekly Outcomes on the week page (over the capacity limit it saves and shows the calm Anti-Overload line); Date goes to Important Dates. Tasks and outcomes can be marked done and hidden (archived). Tables: `ideas`, `tasks`, `weekly_outcomes` (migration 0001). Still for Phase 3: Skip / Move / Pause, Big 3, energy, idea triage and Incubator, week theme and buffer.
 
-Tests (all passing): 42 Vitest (calendar, navigation, period dates, validation, database: seed, plan upsert, focus replace, yearly and multi-day events, archive, settings) + 169 Playwright across desktop/tablet/phone (Phase 1 suite + seeded Q4 plan, save and reload, errors keep input, month → quarter flow, area focus, events add/validate/hide, archive read-only, settings, backup, side-column form fits at 1024px, Quick Capture for all four types and where each lands). E2E uses its own database file.
+Tests (all passing): 43 Vitest (calendar, navigation, period dates, validation, database: seed, plan upsert, focus replace, yearly and multi-day events, archive, settings) + 166 Playwright across desktop/tablet/phone (Phase 1 suite + seeded Q4 plan, save and reload, errors keep input, month → quarter flow, area focus, events add/validate/hide, nothing before Q4 2026, settings, backup, side-column form fits at 1024px, Quick Capture for all four types and where each lands). E2E uses its own database file.
 
 ## 7. Commands
 

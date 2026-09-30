@@ -25,3 +25,9 @@ export const MAX_PRIORITIES = 5;
 export const authConfigured = Boolean(
   process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
 );
+
+/**
+ * The system starts with Q4 2026 (Reem, 30 Sep 2026): no earlier periods are shown or planned.
+ * Earlier URLs redirect to the first period of their level.
+ */
+export const SYSTEM_START = { date: "2026-10-01", year: 2026, quarterKey: "2026-q4", monthKey: "2026-10" } as const;

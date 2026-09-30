@@ -112,12 +112,30 @@ test("important dates: validate, add, show on month and year, hide", async ({ pa
   await expect(page.getByText(title)).toHaveCount(0);
 });
 
-test("past years are a read-only archive", async ({ page }) => {
-  await page.goto("/year/2025");
-  await expect(page.getByText("الأرشيف · للقراءة فقط")).toBeVisible();
-  await expect(page.getByRole("button", { name: /^تعديل|^إضافة/ })).toHaveCount(0);
-  await page.goto("/month/2025-03");
-  await expect(page.getByRole("button", { name: /^تعديل|^إضافة/ })).toHaveCount(0);
+test("the system starts with Q4 2026: nothing earlier is shown", async ({ page }) => {
+  for (const [from, to] of [
+    ["/year/2025", /\/year\/2026$/],
+    ["/quarter/2026-q3", /\/quarter\/2026-q4$/],
+    ["/quarter/2025-q1", /\/quarter\/2026-q4$/],
+    ["/month/2026-09", /\/month\/2026-10$/],
+    ["/week/2026-09-12", /\/week\/2026-09-26$/],
+  ] as const) {
+    await page.goto(from);
+    await expect(page, from).toHaveURL(to);
+  }
+  await page.goto("/year/2026");
+  const years = page.getByRole("navigation", { name: "السنوات" });
+  await expect(years.getByRole("link", { name: /2025/ })).toHaveCount(0);
+  await expect(years.getByRole("link").first()).toHaveText("2026");
+  await expect(page.getByTestId("quarters").getByRole("link")).toHaveCount(1);
+  await expect(page.getByTestId("quarters")).toContainText("قبل بداية النظام");
+  await expect(page.getByRole("link", { name: "الفترة السابقة" })).toHaveCount(0);
+  await page.goto("/quarter/2026-q4");
+  await expect(page.getByRole("link", { name: "الفترة السابقة" })).toHaveCount(0);
+  await page.goto("/month/2026-10");
+  await expect(page.getByRole("link", { name: "الفترة السابقة" })).toHaveCount(0);
+  await page.goto("/month/2026-11");
+  await expect(page.getByRole("link", { name: "الفترة السابقة" })).toHaveAttribute("href", "/month/2026-10");
 });
 
 test("settings: validation and saving", async ({ page }, info) => {

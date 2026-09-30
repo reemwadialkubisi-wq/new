@@ -86,3 +86,16 @@ describe("validateCapture", () => {
     expect(validateCapture({ kind: "nope", text: "x" }).ok).toBe(false);
   });
 });
+
+import { beforeStart } from "./periods";
+
+describe("system start (Q4 2026)", () => {
+  it("periods that end before 1 Oct 2026 are before the start", () => {
+    expect(beforeStart(periodRef("quarter", "2026-q3")!.endDate)).toBe(true);
+    expect(beforeStart(periodRef("month", "2026-09")!.endDate)).toBe(true);
+    expect(beforeStart(periodRef("year", "2025")!.endDate)).toBe(true);
+    expect(beforeStart(periodRef("year", "2026")!.endDate)).toBe(false);
+    expect(beforeStart(periodRef("quarter", "2026-q4")!.endDate)).toBe(false);
+    expect(beforeStart("2026-10-02")).toBe(false); // the 26 Sep – 2 Oct week holds 1 Oct
+  });
+});

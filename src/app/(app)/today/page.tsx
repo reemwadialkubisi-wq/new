@@ -1,0 +1,78 @@
+import type { Metadata } from "next";
+import { CalendarClock, Repeat, Sparkles, MoonStar } from "lucide-react";
+import { Card, SectionTitle } from "@/components/ui/card";
+import { MainWithRail, PageHeader } from "@/components/ui/page-header";
+import { ENERGY, type Energy } from "@/components/ui/status";
+import { Planned } from "@/components/ui/planned";
+import { formatDayLong } from "@/lib/time/calendar";
+import { currentPeriods } from "@/lib/time/current";
+import { cn } from "@/lib/utils";
+
+export const metadata: Metadata = { title: "Today" };
+
+const BIG3 = [
+  { n: 1, label: "Essential", hint: "The one thing that must happen today." },
+  { n: 2, label: "Most Important Outcome", hint: "Moves a weekly outcome forward." },
+  { n: 3, label: "Personal · Family · Development", hint: "Something for you or the people you love." },
+];
+
+export default function TodayPage() {
+  const now = currentPeriods();
+  return (
+    <>
+      <PageHeader
+        eyebrow={`${now.week.label} · ${now.week.range}`}
+        title="Today"
+        arabic="اليوم"
+        subtitle={formatDayLong(now.today)}
+      />
+      <MainWithRail
+        main={
+          <>
+            <Card className="p-6">
+              <SectionTitle meta="Step 1">How is your energy today?</SectionTitle>
+              <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
+                {(Object.keys(ENERGY) as Energy[]).map((level) => (
+                  <div key={level} className="rounded-md border border-border px-4 py-3">
+                    <span className="flex items-center gap-2 text-xs font-semibold tracking-wide text-ink">
+                      <span className={cn("size-2 rounded-full", ENERGY[level].dot)} aria-hidden />
+                      {level}
+                    </span>
+                    <span className="mt-1 block text-xs text-ink-3">{ENERGY[level].meaning}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-3 text-2xs uppercase tracking-[0.08em] text-ink-4">Choosing energy arrives in Phase 3</p>
+            </Card>
+            <Card className="p-6">
+              <SectionTitle meta="Step 2">Today's Big 3</SectionTitle>
+              <ol className="mt-3 divide-y divide-border">
+                {BIG3.map((s) => (
+                  <li key={s.n} className="flex items-start gap-4 py-3.5">
+                    <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full border border-border-strong text-2xs font-medium text-ink-3">{s.n}</span>
+                    <span>
+                      <span className="block text-sm font-medium text-ink-2">{s.label}</span>
+                      <span className="block text-xs text-ink-3">{s.hint}</span>
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            </Card>
+            <Planned title="Optional Development" empty="Nothing optional planned" icon={Sparkles} phase={3}>
+              Optional items adapt to your energy: 7 on Green, 4 on Yellow, 1 on Red. Unfinished ones are never overdue.
+            </Planned>
+          </>
+        }
+        rail={
+          <>
+            <Planned title="Routine" empty="No routine set" icon={Repeat} phase={5}>Morning and evening routines as simple steps.</Planned>
+            <Planned title="Appointments" empty="No appointments today" icon={CalendarClock} phase={3} />
+            <Planned title="Daily Checkout" meta="≤ 2 min" empty="Close the day calmly" icon={MoonStar} phase={3}>
+              Done · Skip without penalty · Move intentionally · Pause.
+            </Planned>
+          </>
+        }
+      />
+    </>
+  );
+}

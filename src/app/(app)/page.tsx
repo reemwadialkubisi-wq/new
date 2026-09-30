@@ -1,0 +1,107 @@
+import Link from "next/link";
+import { CalendarClock, Target } from "lucide-react";
+import { Card, Section, SectionTitle } from "@/components/ui/card";
+import { PageHeader } from "@/components/ui/page-header";
+import { ENERGY, Progress, SignalDot, type Energy } from "@/components/ui/status";
+import { Planned } from "@/components/ui/planned";
+import { CaptureBar } from "@/components/shell/capture-bar";
+import { LIFE_AREAS } from "@/lib/areas";
+import { appConfig } from "@/lib/config";
+import { formatDayLong } from "@/lib/time/calendar";
+import { currentPeriods } from "@/lib/time/current";
+import { cn } from "@/lib/utils";
+
+function greeting(timeZone: string) {
+  const hour = Number(new Intl.DateTimeFormat("en-GB", { hour: "numeric", hourCycle: "h23", timeZone }).format(new Date()));
+  return hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+}
+
+const BIG3 = ["Essential", "Most Important Outcome", "Personal · Family · Development"];
+
+export default function HomePage() {
+  const now = currentPeriods();
+  return (
+    <div className="space-y-6">
+      <PageHeader
+        title={`${greeting(appConfig.timeZone)}, Reem`}
+        subtitle={
+          <>
+            {formatDayLong(now.today)}
+            <span className="text-ink-4"> · </span>
+            {now.quarter.label} · {now.month.label} · {now.week.label} ({now.week.range})
+          </>
+        }
+      />
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+        {/* Today */}
+        <Card className="p-6 lg:col-span-8">
+          <SectionTitle meta={<Link href="/today" className="hover:text-ink">Open Today →</Link>}>Today's Energy</SectionTitle>
+          <div className="mt-4 grid grid-cols-3 gap-2" role="list" aria-label="Energy levels">
+            {(Object.keys(ENERGY) as Energy[]).map((level) => (
+              <Link
+                key={level}
+                href="/today"
+                role="listitem"
+                className="group rounded-md border border-border px-3 py-2.5 transition-colors hover:border-border-strong hover:bg-surface-2"
+              >
+                <span className="flex items-center gap-2 text-xs font-semibold tracking-wide text-ink">
+                  <span className={cn("size-2 rounded-full", ENERGY[level].dot)} aria-hidden />
+                  {level}
+                </span>
+                <span className="mt-0.5 block text-2xs text-ink-3">{ENERGY[level].meaning}</span>
+              </Link>
+            ))}
+          </div>
+
+          <SectionTitle className="mt-8">Today's Big 3</SectionTitle>
+          <ol className="mt-3 divide-y divide-border">
+            {BIG3.map((slot, i) => (
+              <li key={slot} className="flex items-center gap-4 py-3">
+                <span className="flex size-6 shrink-0 items-center justify-center rounded-full border border-border-strong text-2xs font-medium text-ink-3">
+                  {i + 1}
+                </span>
+                <span className="flex-1 text-sm text-ink-3">{slot}</span>
+                <span className="text-2xs text-ink-4">Not chosen yet</span>
+              </li>
+            ))}
+          </ol>
+        </Card>
+
+        <Planned className="lg:col-span-4" title="This Week's Outcomes" meta={now.week.label} empty="No outcomes set for this week" icon={Target} phase={3}>
+          Up to 5 results for the week, chosen on Friday or Saturday.
+        </Planned>
+
+        <Planned className="lg:col-span-8" title={`${now.quarter.label} Objectives`} empty="No quarter objectives yet" phase={2}>
+          Set up to 5 objectives in the Quarter plan. Progress comes from milestones, never from task counts.
+        </Planned>
+
+        <Planned className="lg:col-span-4" title="Upcoming Dates" empty="No important dates ahead" icon={CalendarClock} phase={2}>
+          Appointments, deadlines and important dates appear here.
+        </Planned>
+
+        <Section className="lg:col-span-8" title="Life Areas Status" meta={<Link href="/areas" className="hover:text-ink">All areas →</Link>}>
+          <ul className="grid grid-cols-1 gap-x-6 gap-y-2.5 sm:grid-cols-2 xl:grid-cols-3">
+            {LIFE_AREAS.map((a) => (
+              <li key={a.slug} className="flex items-center justify-between gap-3">
+                <Link href={a.href} className="truncate text-sm text-ink-2 hover:text-ink">{a.name}</Link>
+                <SignalDot signal={null} withLabel={false} />
+              </li>
+            ))}
+          </ul>
+          <p className="mt-4 text-2xs text-ink-4">Quiet signals only: On track · Needs attention · Resting. No scores.</p>
+        </Section>
+
+        <Section className="lg:col-span-4" title={`Annual Progress ${now.year.label}`}>
+          <Progress value={null} label="Annual progress" />
+          <div className="mt-5 flex items-center justify-between border-t border-border pt-4 text-xs">
+            <span className="text-ink-3">Load</span>
+            <span className="text-ink-2">Not measured yet</span>
+          </div>
+        </Section>
+      </div>
+
+      <CaptureBar />
+    </div>
+  );
+}

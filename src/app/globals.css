@@ -1,0 +1,143 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ------------------------------------------------------------------
+   REEM LIFE OS — Design tokens (Phase 1)
+   Ink/slate neutrals · one muted teal accent · muted energy colours.
+   Change tokens here only; components never hard-code colours.
+------------------------------------------------------------------- */
+:root {
+  --bg: #f6f6f3;
+  --surface: #ffffff;
+  --surface-2: #f0f0ec;
+  --surface-3: #e8e8e3;
+  --border: #e3e3dd;
+  --border-strong: #cfcfc7;
+  --ink: #15181c;
+  --ink-2: #474d55;
+  --ink-3: #7a8089;
+  --ink-4: #a3a8ae;
+
+  --accent: #2e6b66;
+  --accent-hover: #245753;
+  --accent-soft: #e4efec;
+  --accent-ink: #ffffff;
+
+  --green: #5f8a68;
+  --green-soft: #e6eee6;
+  --yellow: #a9843a;
+  --yellow-soft: #f4ecda;
+  --red: #a45c49;
+  --red-soft: #f3e3dd;
+
+  --focus: #2e6b66;
+  --shadow-pop: 0 1px 2px rgb(20 24 28 / 0.04), 0 12px 32px -8px rgb(20 24 28 / 0.16);
+  color-scheme: light;
+}
+
+.dark {
+  --bg: #0f1113;
+  --surface: #15181b;
+  --surface-2: #1b1f23;
+  --surface-3: #22272c;
+  --border: #262b30;
+  --border-strong: #353b42;
+  --ink: #eceeef;
+  --ink-2: #b4b9bf;
+  --ink-3: #858b92;
+  --ink-4: #5d636a;
+
+  --accent: #74b3aa;
+  --accent-hover: #8cc3bb;
+  --accent-soft: #1b2f2c;
+  --accent-ink: #0f1113;
+
+  --green: #8fb497;
+  --green-soft: #1c2820;
+  --yellow: #d3b16b;
+  --yellow-soft: #2c2618;
+  --red: #cd8a76;
+  --red-soft: #2f1f1a;
+
+  --focus: #74b3aa;
+  --shadow-pop: 0 1px 2px rgb(0 0 0 / 0.3), 0 16px 40px -8px rgb(0 0 0 / 0.55);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-ink-4: var(--ink-4);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-ink: var(--accent-ink);
+  --color-green: var(--green);
+  --color-green-soft: var(--green-soft);
+  --color-yellow: var(--yellow);
+  --color-yellow-soft: var(--yellow-soft);
+  --color-red: var(--red);
+  --color-red-soft: var(--red-soft);
+
+  --font-sans: "IBM Plex Sans", "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Newsreader Variable", "IBM Plex Sans Arabic", Georgia, serif;
+  --font-arabic: "IBM Plex Sans Arabic", "IBM Plex Sans", sans-serif;
+
+  /* Type scale (px): 12 · 13 · 14 · 16 · 20 · 28 · 36 */
+  --text-2xs: 0.75rem;
+  --text-2xs--line-height: 1rem;
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.125rem;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.375rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.625rem;
+  --text-lg: 1.25rem;
+  --text-lg--line-height: 1.75rem;
+  --text-xl: 1.75rem;
+  --text-xl--line-height: 2.125rem;
+  --text-2xl: 2.25rem;
+  --text-2xl--line-height: 2.625rem;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --shadow-pop: var(--shadow-pop);
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    line-height: var(--text-sm--line-height);
+  }
+  :lang(ar), [dir="rtl"] {
+    font-family: var(--font-arabic);
+  }
+  ::selection { background: var(--accent-soft); }
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  * { border-color: var(--border); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}

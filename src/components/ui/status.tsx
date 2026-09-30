@@ -6,7 +6,7 @@ export type Energy = "GREEN" | "YELLOW" | "RED";
 
 export const ENERGY: Record<Energy, { label: string; meaning: string; dot: string; soft: string; text: string }> = {
   GREEN: { label: "Green", meaning: "Normal plan", dot: "bg-green", soft: "bg-green-soft", text: "text-green-text" },
-  YELLOW: { label: "Yellow", meaning: "Reduce optional load", dot: "bg-yellow", soft: "bg-yellow-soft", text: "text-yellow-text" },
+  YELLOW: { label: "Yellow", meaning: "Reduce optional load", dot: "border-[1.5px] border-green bg-transparent", soft: "bg-yellow-soft", text: "text-yellow-text" },
   RED: { label: "Red", meaning: "Essentials only", dot: "bg-red", soft: "bg-red-soft", text: "text-red-text" },
 };
 
@@ -32,7 +32,7 @@ export function EnergyChip({ level, className }: { level: Energy | null; classNa
 export type AreaSignal = "on-track" | "needs-attention" | "resting";
 const SIGNAL: Record<AreaSignal, { label: string; dot: string }> = {
   "on-track": { label: "On track", dot: "bg-green" },
-  "needs-attention": { label: "Needs attention", dot: "bg-yellow" },
+  "needs-attention": { label: "Needs attention", dot: "bg-accent" },
   resting: { label: "Resting", dot: "bg-ink-4" },
 };
 
@@ -50,11 +50,11 @@ export function SignalDot({ signal, withLabel = true }: { signal: AreaSignal | n
 
 export type EntityStatus = "active" | "planned" | "paused" | "incubating" | "completed" | "archived";
 const STATUS: Record<EntityStatus, string> = {
-  active: "bg-accent-soft text-accent-text",
+  active: "bg-accent-soft text-ink",
   planned: "bg-surface-2 text-ink-2",
-  paused: "bg-yellow-soft text-yellow-text",
+  paused: "bg-surface-2 text-ink-2",
   incubating: "bg-surface-2 text-ink-3",
-  completed: "bg-green-soft text-green-text",
+  completed: "bg-green-soft text-ink",
   archived: "bg-surface-2 text-ink-4",
 };
 

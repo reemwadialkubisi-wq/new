@@ -11,8 +11,8 @@ export const metadata: Metadata = { title: "Design System" };
 
 const COLORS = [
   ["bg", "Page"], ["surface", "Surface"], ["surface-2", "Surface 2"], ["border", "Border"],
-  ["ink", "Ink"], ["ink-2", "Ink 2"], ["ink-3", "Ink 3"], ["accent", "Accent · pink"],
-  ["green", "Success · mint"], ["yellow", "Energy · amber"], ["red", "Energy · clay"], ["accent-soft", "Accent soft"],
+  ["ink", "Ink"], ["ink-2", "Ink 2"], ["ink-3", "Ink 3"], ["pink", "Pink #CF6F9B"],
+  ["mint", "Mint #7FC3A7"], ["accent-soft", "Pink soft"], ["green-soft", "Mint soft"], ["surface-3", "Surface 3"],
 ];
 
 export default function SystemPage() {

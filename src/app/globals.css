@@ -8,71 +8,70 @@
    Change tokens here only; components never hard-code colours.
 ------------------------------------------------------------------- */
 :root {
-  --bg: #f6f6f3;
+  /* Only two colours, chosen by Reem, plus pure neutrals:
+     pink #CF6F9B = interaction, inspiration, achievement
+     mint #7FC3A7 = success, wellbeing, calm
+     Together ~10-15% of the UI. Text on pink or mint fills is always dark.
+     Soft tints are the same two colours at low opacity, never new hues. */
+  --pink: #cf6f9b;
+  --mint: #7fc3a7;
+
+  --bg: #f7f7f7;
   --surface: #ffffff;
-  --surface-2: #f0f0ec;
-  --surface-3: #e8e8e3;
-  --border: #e3e3dd;
-  --border-strong: #cfcfc7;
-  --ink: #15181c;
-  --ink-2: #474d55;
-  --ink-3: #7a8089;
-  --ink-4: #a3a8ae;
+  --surface-2: #f1f1f1;
+  --surface-3: #e9e9e9;
+  --border: #e4e4e4;
+  --border-strong: #d0d0d0;
+  --ink: #161616;
+  --ink-2: #4a4a4a;
+  --ink-3: #767676;
+  --ink-4: #a6a6a6;
 
-  /* Reem's palette: pink = interaction, inspiration, achievement · mint = success, wellbeing, calm.
-     Together ~10-15% of the UI. Text on pink or mint fills is always dark. */
-  --accent: #cf6f9b;
-  --accent-hover: #c35d8c;
-  --accent-soft: #f8e6ee;
-  --accent-ink: #15181c;
-  --accent-text: #a4466f; /* pink text on light backgrounds */
+  --accent: var(--pink);
+  --accent-hover: var(--pink);
+  --accent-soft: color-mix(in srgb, var(--pink) 14%, transparent);
+  --accent-ink: #161616;
+  /* No darker shades: on a light page, text stays neutral ink; pink/mint appear as fills, dots, icons and borders. */
+  --accent-text: var(--ink);
 
-  --green: #7fc3a7;
-  --green-soft: #e3f3ec;
-  --green-text: #34715a;
-  --yellow: #a9843a;
-  --yellow-soft: #f4ecda;
-  --yellow-text: #8a6a2a;
-  --red: #a45c49;
-  --red-soft: #f3e3dd;
-  --red-text: #a45c49;
+  /* Energy & status use only the two colours:
+     GREEN = mint · YELLOW = hollow mint ring · RED = pink (essentials only, gentle care) */
+  --green: var(--mint);
+  --green-soft: color-mix(in srgb, var(--mint) 20%, transparent);
+  --green-text: var(--ink);
+  --yellow: var(--mint);
+  --yellow-soft: var(--surface-2);
+  --yellow-text: var(--ink-2);
+  --red: var(--pink);
+  --red-soft: var(--accent-soft);
+  --red-text: var(--accent-text);
 
-  --focus: #a4466f;
-  --shadow-pop: 0 1px 2px rgb(20 24 28 / 0.04), 0 12px 32px -8px rgb(20 24 28 / 0.16);
+  --focus: var(--pink);
+  --shadow-pop: 0 1px 2px rgb(0 0 0 / 0.04), 0 12px 32px -8px rgb(0 0 0 / 0.16);
   color-scheme: light;
 }
 
 .dark {
-  /* Night background */
-  --bg: #0f1420;
-  --surface: #171d2b;
-  --surface-2: #1d2433;
-  --surface-3: #252d3f;
-  --border: #262e40;
-  --border-strong: #354057;
-  --ink: #eceef3;
-  --ink-2: #b6bccb;
-  --ink-3: #868ea3;
-  --ink-4: #5b6379;
+  --bg: #111111;
+  --surface: #181818;
+  --surface-2: #1f1f1f;
+  --surface-3: #272727;
+  --border: #2a2a2a;
+  --border-strong: #3a3a3a;
+  --ink: #eeeeee;
+  --ink-2: #bdbdbd;
+  --ink-3: #8c8c8c;
+  --ink-4: #5e5e5e;
 
-  --accent: #cf6f9b;
-  --accent-hover: #d985ab;
-  --accent-soft: #2c1d2b;
-  --accent-ink: #15181c;
-  --accent-text: #dc8cb0;
+  --accent-soft: color-mix(in srgb, var(--pink) 16%, transparent);
+  --accent-text: var(--pink);
+  --green-soft: color-mix(in srgb, var(--mint) 16%, transparent);
+  --green-text: var(--mint);
+  --yellow-soft: var(--surface-2);
+  --yellow-text: var(--ink-2);
 
-  --green: #7fc3a7;
-  --green-soft: #172a2a;
-  --green-text: #8fd0b4;
-  --yellow: #d3b16b;
-  --yellow-soft: #2b2719;
-  --yellow-text: #d3b16b;
-  --red: #cd8a76;
-  --red-soft: #2e1f22;
-  --red-text: #d99a87;
-
-  --focus: #dc8cb0;
-  --shadow-pop: 0 1px 2px rgb(0 0 0 / 0.3), 0 16px 40px -8px rgb(0 0 0 / 0.55);
+  --focus: var(--pink);
+  --shadow-pop: 0 1px 2px rgb(0 0 0 / 0.3), 0 16px 40px -8px rgb(0 0 0 / 0.6);
   color-scheme: dark;
 }
 

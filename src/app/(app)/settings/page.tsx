@@ -53,7 +53,7 @@ export default function SettingsPage() {
               </p>
             </Section>
             <Section title="Design system">
-              <Link href="/system" className="text-sm text-accent-text hover:underline">View tokens and components →</Link>
+              <Link href="/system" className="text-sm text-accent-text underline decoration-accent decoration-2 underline-offset-4">View tokens and components →</Link>
             </Section>
           </>
         }

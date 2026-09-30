@@ -93,7 +93,7 @@ test("dark mode switches and persists", async ({ page }, info) => {
   await page.reload();
   await expect(page.locator("html")).toHaveClass(/dark/);
   const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
-  expect(bg).toBe("rgb(15, 20, 32)");
+  expect(bg).toBe("rgb(17, 17, 17)");
   await page.getByRole("main").getByRole("radio", { name: "Light" }).click();
   await expect(page.locator("html")).not.toHaveClass(/dark/);
 });

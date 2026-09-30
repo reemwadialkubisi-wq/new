@@ -94,7 +94,7 @@ export function NavTree({ rail, onNavigate }: { rail?: boolean; onNavigate?: () 
                           active ? "bg-accent-soft font-medium text-ink" : "text-ink-2 hover:bg-surface-2 hover:text-ink",
                         )}
                       >
-                        <Icon className={cn("size-4 shrink-0", active ? "text-accent-text" : "text-ink-3")} aria-hidden />
+                        <Icon className={cn("size-4 shrink-0", active ? "text-accent" : "text-ink-3")} aria-hidden />
                         {rail ? <span className="sr-only">{item.label}</span> : <span className="truncate">{item.label}</span>}
                       </Link>
                     </li>

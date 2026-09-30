@@ -4,7 +4,7 @@ import { Target, NotebookPen, Hourglass } from "lucide-react";
 import { Card, Section, SectionTitle } from "@/components/ui/card";
 import { MainWithRail, PageHeader, PeriodNav } from "@/components/ui/page-header";
 import { Planned } from "@/components/ui/planned";
-import { getSettings, listOutcomes, routineProgress, tasksBetween } from "@/db/repo";
+import { getSettings, habitProgress, listOutcomes, routineProgress, tasksBetween } from "@/db/repo";
 import { RoutineProgressList } from "@/components/plan/routine";
 import Link from "next/link";
 import { SYSTEM_START } from "@/lib/config";
@@ -42,6 +42,7 @@ export default async function WeekPage({ params }: Props) {
   const weekTasks = tasksBetween(from, to);
   const maxOutcomes = getSettings().capacity.weeklyOutcomes;
   const progress = routineProgress(from, to);
+  const habitsProgress = habitProgress(from, to);
 
   return (
     <>
@@ -128,8 +129,8 @@ export default async function WeekPage({ params }: Props) {
               title="الأنظمة المستمرة · هذا الأسبوع"
               meta={<Link href="/settings/routine" className="hover:text-ink">الجدول ←</Link>}
             >
-              {progress.length ? (
-                <RoutineProgressList items={progress} />
+              {progress.length || habitsProgress.length ? (
+                <RoutineProgressList habits={habitsProgress} items={progress} />
               ) : (
                 <p className="text-sm text-ink-3">لا توجد حدود دنيا أسبوعية بعد.</p>
               )}

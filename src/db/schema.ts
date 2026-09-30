@@ -163,6 +163,17 @@ export type WeeklyOutcome = typeof weeklyOutcomes.$inferSelect;
    records it (routine_checks), and that one tick feeds its weekly minimum and its cycle target,
    so nothing is logged twice. This is the Phase 0 Routine + Habit + HabitCheck in one place. */
 
+/** Continuous systems with a weekly minimum (movement 3/week, English 3/week…). Filled only by routine ticks. */
+export const habits = sqliteTable("habits", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  title: text("title").notNull(),
+  area: text("area"),
+  weeklyMinimum: integer("weekly_minimum"),
+  note: text("note").notNull().default(""),
+  ...timestamps,
+  archivedAt: text("archived_at"),
+});
+
 export const routineItems = sqliteTable("routine_items", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   title: text("title").notNull(),
@@ -176,6 +187,10 @@ export const routineItems = sqliteTable("routine_items", {
   weeklyMinimum: integer("weekly_minimum"),
   /** e.g. Al-Baqarah: 90 readings between activeFrom and activeTo. */
   targetCount: integer("target_count"),
+  /** A tick on this item also counts for this habit (e.g. Fajr + light movement → movement). */
+  habitId: integer("habit_id").references(() => habits.id),
+  /** A slot where she picks at tick time which habit it was (e.g. one knowledge goal: English, PhD or reading). */
+  choiceHabitIds: text("choice_habit_ids", { mode: "json" }).$type<number[]>(),
   activeFrom: text("active_from"),
   activeTo: text("active_to"),
   note: text("note").notNull().default(""),
@@ -189,6 +204,8 @@ export const routineChecks = sqliteTable(
     id: integer("id").primaryKey({ autoIncrement: true }),
     itemId: integer("item_id").notNull().references(() => routineItems.id, { onDelete: "cascade" }),
     date: text("date").notNull(),
+    /** The habit this tick counted for (the item's habit, or the one picked in a choice slot). */
+    habitId: integer("habit_id").references(() => habits.id),
     createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
   },
   (t) => [uniqueIndex("routine_checks_item_date").on(t.itemId, t.date)],
@@ -205,3 +222,4 @@ export const dayLogs = sqliteTable("day_logs", {
 });
 
 export type RoutineItem = typeof routineItems.$inferSelect;
+export type Habit = typeof habits.$inferSelect;

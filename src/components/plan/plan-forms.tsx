@@ -169,10 +169,14 @@ const WEEK_ORDER = [6, 0, 1, 2, 3, 4, 5]; // Saturday first
 export interface RoutineFormValues {
   title: string; startTime: string; endTime: string | null; area: string | null; tier: string; days: string;
   weeklyMinimum: number | null; targetCount: number | null; activeFrom: string | null; activeTo: string | null; note: string;
+  habitId: number | null; choiceHabitIds?: number[] | null;
 }
 
-export function RoutineForm({ action, initial, submitLabel }: { action: Action; initial?: RoutineFormValues; submitLabel?: string }) {
-  const v = initial ?? { title: "", startTime: "", endTime: null, area: null, tier: "should", days: "0123456", weeklyMinimum: null, targetCount: null, activeFrom: null, activeTo: null, note: "" };
+export function RoutineForm({
+  action, initial, submitLabel, habits,
+}: { action: Action; initial?: RoutineFormValues; submitLabel?: string; habits: { id: number; title: string }[] }) {
+  const v = initial ?? { title: "", startTime: "", endTime: null, area: null, tier: "should", days: "0123456", weeklyMinimum: null, targetCount: null, activeFrom: null, activeTo: null, note: "", habitId: null };
+  const choice = (v.choiceHabitIds ?? []).length > 0;
   return (
     <ActionForm action={action} submitLabel={submitLabel} resetOnSave={!initial}>
       <div className="grid grid-cols-1 gap-4 @md:grid-cols-[1fr_7rem_7rem]">
@@ -203,6 +207,20 @@ export function RoutineForm({ action, initial, submitLabel }: { action: Action; 
           </Select>
         </FormField>
       </div>
+      {choice ? (
+        <p className="text-xs text-ink-3">
+          خانة اختيار: عند التعليم تختارين {habits.filter((h) => v.choiceHabitIds!.includes(h.id)).map((h) => h.title).join(" أو ")}.
+        </p>
+      ) : (
+        <FormField name="habitId" label="كل ✓ يُحسب أيضًا في" hint="نظام مستمر بحد أدنى أسبوعي، مثل الحركة.">
+          <Select name="habitId" defaultValue={v.habitId ? String(v.habitId) : ""}>
+            <option value="">لا شيء</option>
+            {habits.map((h) => (
+              <option key={h.id} value={h.id}>{h.title}</option>
+            ))}
+          </Select>
+        </FormField>
+      )}
       <fieldset>
         <legend className="mb-1.5 text-xs font-medium text-ink-2">الأيام</legend>
         <div className="flex flex-wrap gap-x-4 gap-y-2">
@@ -227,6 +245,33 @@ export function RoutineForm({ action, initial, submitLabel }: { action: Action; 
         </FormField>
         <FormField name="activeTo" label="تنتهي">
           <Input name="activeTo" type="date" dir="ltr" defaultValue={v.activeTo ?? ""} />
+        </FormField>
+      </div>
+      <FormField name="note" label="ملاحظة (اختياري)">
+        <Input name="note" defaultValue={v.note} maxLength={240} />
+      </FormField>
+    </ActionForm>
+  );
+}
+
+export function HabitForm({ action, initial }: { action: Action; initial?: { title: string; area: string | null; weeklyMinimum: number | null; note: string } }) {
+  const v = initial ?? { title: "", area: null, weeklyMinimum: null, note: "" };
+  return (
+    <ActionForm action={action} resetOnSave={!initial} submitLabel={initial ? "حفظ" : "إضافة"}>
+      <div className="grid grid-cols-1 gap-4 @md:grid-cols-[1fr_10rem_8rem]">
+        <FormField name="title" label="النظام">
+          <Input name="title" defaultValue={v.title} maxLength={80} />
+        </FormField>
+        <FormField name="area" label="المجال">
+          <Select name="area" defaultValue={v.area ?? ""}>
+            <option value="">بدون</option>
+            {LIFE_AREAS.map((a) => (
+              <option key={a.slug} value={a.slug}>{a.name}</option>
+            ))}
+          </Select>
+        </FormField>
+        <FormField name="weeklyMinimum" label="حد أدنى أسبوعي">
+          <Input name="weeklyMinimum" type="number" inputMode="numeric" min={1} max={14} dir="ltr" defaultValue={v.weeklyMinimum ?? ""} />
         </FormField>
       </div>
       <FormField name="note" label="ملاحظة (اختياري)">

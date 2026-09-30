@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { EyeOff } from "lucide-react";
-import { archiveRoutineAction, saveRoutineAction } from "../../actions";
+import { archiveRoutineAction, saveHabitAction, saveRoutineAction } from "../../actions";
 import { PageHeader } from "@/components/ui/page-header";
 import { TierBadge } from "@/components/ui/status";
 import { EditableSection } from "@/components/plan/forms";
-import { RoutineForm } from "@/components/plan/plan-forms";
-import { listRoutine } from "@/db/repo";
+import { HabitForm, RoutineForm } from "@/components/plan/plan-forms";
+import { Section } from "@/components/ui/card";
+import { listHabits, listRoutine } from "@/db/repo";
 import { LIFE_AREAS } from "@/lib/areas";
 import { WEEKDAYS_AR } from "@/lib/time/calendar";
 
@@ -22,6 +23,8 @@ function daysLabel(days: string) {
 
 export default function RoutinePage() {
   const items = listRoutine();
+  const habits = listHabits();
+  const habitName = Object.fromEntries(habits.map((h) => [h.id, h.title]));
   return (
     <>
       <PageHeader
@@ -30,12 +33,27 @@ export default function RoutinePage() {
         english="Daily Routine"
         subtitle="يومك من الاستيقاظ إلى النوم. كل ✓ في صفحة اليوم يُحسب تلقائيًا في مجاله وحدّه الأسبوعي وهدفه."
       />
+      <Section title="الأنظمة المستمرة · Habits" meta="تمتلئ من علامات ✓ فقط" className="mb-6">
+        <ul className="divide-y divide-border" data-testid="habits">
+          {habits.map((h) => (
+            <li key={h.id} className="py-3">
+              <EditableSection
+                className="border-0 bg-transparent p-0"
+                title={h.title}
+                meta={h.weeklyMinimum ? `${h.weeklyMinimum} أسبوعيًا` : "بلا حد أدنى"}
+                view={<p className="text-xs text-ink-3" dir="auto">{h.note || " "}</p>}
+                form={<HabitForm action={saveHabitAction.bind(null, h.id)} initial={h} />}
+              />
+            </li>
+          ))}
+        </ul>
+      </Section>
       <div className="space-y-4">
         <EditableSection
           title="إضافة بند"
           editLabel="إضافة"
           view={<p className="text-sm text-ink-3">بند جديد في الجدول: وقته وأيامه ومجاله، وحد أدنى أسبوعي أو هدف إن وُجد.</p>}
-          form={<RoutineForm action={saveRoutineAction.bind(null, null)} submitLabel="إضافة" />}
+          form={<RoutineForm action={saveRoutineAction.bind(null, null)} submitLabel="إضافة" habits={habits} />}
         />
         {items.map((i) => (
           <EditableSection
@@ -49,6 +67,8 @@ export default function RoutinePage() {
                     {i.area ? ` · ${AREA_NAME[i.area]}` : ""}
                     {i.weeklyMinimum ? ` · ${i.weeklyMinimum} مرات أسبوعيًا` : ""}
                     {i.targetCount ? ` · هدف ${i.targetCount} (${i.activeFrom} – ${i.activeTo})` : ""}
+                    {i.habitId ? ` · يُحسب في ${habitName[i.habitId]}` : ""}
+                    {i.choiceHabitIds?.length ? ` · اختيار: ${i.choiceHabitIds.map((id) => habitName[id]).filter(Boolean).join(" / ")}` : ""}
                   </p>
                   {i.note ? <p className="text-xs text-ink-3" dir="auto">{i.note}</p> : null}
                 </div>
@@ -63,7 +83,7 @@ export default function RoutinePage() {
                 </div>
               </div>
             }
-            form={<RoutineForm action={saveRoutineAction.bind(null, i.id)} initial={i} />}
+            form={<RoutineForm action={saveRoutineAction.bind(null, i.id)} initial={i} habits={habits} />}
           />
         ))}
       </div>

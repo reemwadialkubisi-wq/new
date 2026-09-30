@@ -103,9 +103,9 @@ describe("system start (Q4 2026)", () => {
 import { validateRoutine } from "./validate";
 
 describe("validateRoutine", () => {
-  const base = { title: "إنجليزي", startTime: "19:30", tier: "should", days: ["1", "0", "9"], weeklyMinimum: "3" };
+  const base = { title: "إنجليزي", startTime: "19:30", tier: "should", days: ["1", "0", "9"], weeklyMinimum: "3", habitId: "2" };
   it("accepts an item and cleans the days", () => {
-    expect(validateRoutine(base)).toMatchObject({ ok: true, value: { days: "01", weeklyMinimum: 3, endTime: null, targetCount: null } });
+    expect(validateRoutine(base)).toMatchObject({ ok: true, value: { days: "01", weeklyMinimum: 3, endTime: null, targetCount: null, habitId: 2 } });
   });
   it("checks times, days and cycle dates", () => {
     const r = validateRoutine({ ...base, startTime: "7pm", endTime: "", days: [], targetCount: "90" });

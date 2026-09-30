@@ -130,6 +130,7 @@ export function validateCapture(raw: { kind?: unknown; text?: unknown; date?: un
 export interface RoutineInput {
   title: string; startTime: string; endTime: string | null; area: string | null; tier: Tier; days: string;
   weeklyMinimum: number | null; targetCount: number | null; activeFrom: string | null; activeTo: string | null; note: string;
+  habitId: number | null;
 }
 
 const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
@@ -145,6 +146,7 @@ export function validateRoutine(raw: Record<string, unknown> & { days?: unknown[
   const activeFrom = clean(raw.activeFrom) || null;
   const activeTo = clean(raw.activeTo) || null;
   const note = clean(raw.note);
+  const habitId = Number(clean(raw.habitId)) || null;
   const optInt = (name: string, max: number) => {
     const v = clean(raw[name]);
     if (!v) return null;
@@ -172,5 +174,23 @@ export function validateRoutine(raw: Record<string, unknown> & { days?: unknown[
   if (note.length > 200) errors.note = tooLong(200);
   return Object.keys(errors).length
     ? { ok: false, errors }
-    : { ok: true, value: { title, startTime, endTime, area, tier, days, weeklyMinimum, targetCount, activeFrom, activeTo, note } };
+    : { ok: true, value: { title, startTime, endTime, area, tier, days, weeklyMinimum, targetCount, activeFrom, activeTo, note, habitId } };
+}
+
+export interface HabitInput { title: string; area: string | null; weeklyMinimum: number | null; note: string }
+
+export function validateHabit(raw: Record<string, unknown>): Result<HabitInput> {
+  const errors: Errors = {};
+  const title = clean(raw.title);
+  const area = clean(raw.area) || null;
+  const note = clean(raw.note);
+  const w = clean(raw.weeklyMinimum);
+  const weeklyMinimum = w ? Number(w) : null;
+  if (!title) errors.title = "اكتبي اسمًا قصيرًا.";
+  else if (title.length > 60) errors.title = tooLong(60);
+  if (area && !AREA_SLUGS.has(area)) errors.area = "اختاري المجال من القائمة.";
+  if (weeklyMinimum !== null && (!Number.isInteger(weeklyMinimum) || weeklyMinimum < 1 || weeklyMinimum > 14))
+    errors.weeklyMinimum = "رقم صحيح من 1 إلى 14، أو اتركيه فارغًا.";
+  if (note.length > 200) errors.note = tooLong(200);
+  return Object.keys(errors).length ? { ok: false, errors } : { ok: true, value: { title, area, weeklyMinimum, note } };
 }

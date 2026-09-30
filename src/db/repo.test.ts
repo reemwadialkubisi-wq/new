@@ -99,42 +99,86 @@ describe("quick capture destinations", () => {
   });
 });
 
-import { getEnergy, listRoutine, routineForDay, routineProgress, saveRoutineItem, setEnergy, setRoutineCheck } from "./repo";
+import { getEnergy, habitProgress, listHabits, listRoutine, routineForDay, routineProgress, saveRoutineItem, setEnergy, setRoutineCheck } from "./repo";
+import { getDb } from "./index";
+import { routineItems } from "./schema";
+import { seedRoutine } from "./seed";
 
-describe("daily routine", () => {
-  it("is seeded from 5:00 to 22:00, with Al-Baqarah as a 90-reading cycle", () => {
+const W = ["2026-10-03", "2026-10-09"] as const; // W40, Saturday to Friday
+
+describe("daily routine (Reem's schedule)", () => {
+  it("runs from 5:00 to 22:00, with Al-Baqarah as a 90-reading cycle", () => {
     const items = listRoutine();
-    expect(items[0]).toMatchObject({ startTime: "05:00" });
-    expect(items.at(-1)).toMatchObject({ startTime: "22:00" });
+    expect(items[0]).toMatchObject({ startTime: "05:00", endTime: "05:30" });
+    expect(items.at(-1)).toMatchObject({ startTime: "22:00", title: "نوم" });
     expect(items.find((i) => i.title === "سورة البقرة")).toMatchObject({ targetCount: 90, activeFrom: "2026-10-01" });
+    expect(listHabits().map((h) => h.title)).toEqual(["حركة", "إنجليزي", "الدكتوراه", "معرفة تخصصية"]);
   });
-  it("shows only the weekday's items (work Sunday to Thursday, review on Friday)", () => {
-    const fri = routineForDay("2026-10-09", "2026-10-03", "2026-10-09").map((i) => i.item.title);
+  it("work and commute are Sunday to Thursday; the weekly review is on Friday", () => {
+    const fri = routineForDay("2026-10-09", ...W).map((i) => i.item.title);
     expect(fri).toContain("المراجعة الأسبوعية");
     expect(fri).not.toContain("العمل");
-    const sun = routineForDay("2026-10-04", "2026-10-03", "2026-10-09").map((i) => i.item.title);
+    expect(fri).not.toContain("الذهاب للعمل");
+    const sun = routineForDay("2026-10-04", ...W).map((i) => i.item.title);
     expect(sun).toContain("العمل");
     expect(sun).not.toContain("المراجعة الأسبوعية");
   });
-  it("one tick feeds the weekly minimum and the cycle; unticking takes it back", () => {
-    const eng = listRoutine().find((i) => i.title.startsWith("إنجليزي"))!;
+  it("Fajr and the evening walk both count toward movement", () => {
+    const [fajr, walk] = ["الفجر + حركة بسيطة 10–15 دقيقة", "حركة أو مشي عند القدرة"].map((t) => listRoutine().find((i) => i.title === t)!);
+    setRoutineCheck(fajr.id, "2026-10-03", true);
+    setRoutineCheck(walk.id, "2026-10-03", true);
+    setRoutineCheck(fajr.id, "2026-10-04", true);
+    setRoutineCheck(fajr.id, "2026-10-04", true); // same day twice counts once
+    const movement = habitProgress(...W).find((h) => h.habit.title === "حركة")!;
+    expect(movement.week).toBe(3);
+    const day = routineForDay("2026-10-04", ...W).find((i) => i.item.id === walk.id)!;
+    expect(day.habit?.week).toBe(3);
+    expect(day.done).toBe(false);
+  });
+  it("the knowledge slot counts toward the one she picks, and can be changed or undone", () => {
+    const slot = listRoutine().find((i) => i.title === "هدف معرفي واحد فقط")!;
+    const [english, phd] = ["إنجليزي", "الدكتوراه"].map((t) => listHabits().find((h) => h.title === t)!.id);
+    setRoutineCheck(slot.id, "2026-10-05", true); // no pick: nothing recorded
+    expect(routineForDay("2026-10-05", ...W).find((i) => i.item.id === slot.id)?.done).toBe(false);
+    setRoutineCheck(slot.id, "2026-10-05", true, english);
+    setRoutineCheck(slot.id, "2026-10-06", true, english);
+    let hp = habitProgress(...W);
+    expect(hp.find((h) => h.habit.id === english)?.week).toBe(2);
+    setRoutineCheck(slot.id, "2026-10-06", true, phd); // changed her mind
+    hp = habitProgress(...W);
+    expect(hp.find((h) => h.habit.id === english)?.week).toBe(1);
+    expect(hp.find((h) => h.habit.id === phd)?.week).toBe(1);
+    const today = routineForDay("2026-10-06", ...W).find((i) => i.item.id === slot.id)!;
+    expect(today).toMatchObject({ done: true, picked: phd });
+    expect(today.choices.map((c) => c.habit.title)).toEqual(["إنجليزي", "الدكتوراه", "معرفة تخصصية"]);
+    setRoutineCheck(slot.id, "2026-10-06", false);
+    expect(habitProgress(...W).find((h) => h.habit.id === phd)?.week).toBe(0);
+  });
+  it("Al-Baqarah ticks count toward its cycle, not before 1 Oct", () => {
     const baq = listRoutine().find((i) => i.title === "سورة البقرة")!;
-    for (const d of ["2026-10-03", "2026-10-04"]) {
-      setRoutineCheck(eng.id, d, true);
-      setRoutineCheck(baq.id, d, true);
-    }
-    setRoutineCheck(eng.id, "2026-10-04", true); // twice the same day counts once
-    const day = routineForDay("2026-10-04", "2026-10-03", "2026-10-09");
-    expect(day.find((i) => i.item.id === eng.id)).toMatchObject({ done: true, week: 2 });
-    expect(day.find((i) => i.item.id === baq.id)).toMatchObject({ done: true, cycle: 2 });
-    setRoutineCheck(eng.id, "2026-10-04", false);
-    expect(routineProgress("2026-10-03", "2026-10-09").find((p) => p.item.id === eng.id)?.week).toBe(1);
-    expect(routineForDay("2026-09-30", "2026-09-26", "2026-10-02").find((i) => i.item.id === baq.id)).toBeUndefined(); // before its cycle
+    setRoutineCheck(baq.id, "2026-10-03", true);
+    setRoutineCheck(baq.id, "2026-10-04", true);
+    expect(routineProgress(...W).find((p) => p.item.id === baq.id)?.cycle).toBe(2);
+    expect(routineForDay("2026-09-30", "2026-09-26", "2026-10-02").find((i) => i.item.id === baq.id)).toBeUndefined();
   });
   it("items can be edited", () => {
-    const eng = listRoutine().find((i) => i.title.startsWith("إنجليزي"))!;
-    saveRoutineItem(eng.id, { ...eng, startTime: "20:00" });
-    expect(listRoutine().find((i) => i.id === eng.id)?.startTime).toBe("20:00");
+    const walk = listRoutine().find((i) => i.title === "حركة أو مشي عند القدرة")!;
+    saveRoutineItem(walk.id, { ...walk, startTime: "20:05" });
+    expect(listRoutine().find((i) => i.id === walk.id)?.startTime).toBe("20:05");
+  });
+  it("an untouched first draft is replaced by her schedule, keeping Al-Baqarah and its ticks", () => {
+    const db = getDb();
+    const baq = listRoutine().find((i) => i.title === "سورة البقرة")!;
+    db.update(routineItems).set({ archivedAt: "2026-09-30 00:00:00" }).run();
+    db.update(routineItems).set({ archivedAt: null, updatedAt: baq.createdAt }).where(eqId(baq.id)).run();
+    const draft = ["استيقاظ", "الأطفال والتجهيز للعمل", "قراءة تخصصية", "العمل", "حركة 20 دقيقة", "وقت الأطفال", "إنجليزي 20 دقيقة", "المراجعة الأسبوعية", "قراءة شخصية 10–15 دقيقة", "نوم"];
+    db.insert(routineItems).values(draft.map((title) => ({ title, startTime: "05:00", createdAt: "2026-09-30 10:00:00", updatedAt: "2026-09-30 10:00:00" }))).run();
+    seedRoutine(db);
+    const titles = listRoutine().map((i) => i.title);
+    expect(titles).toContain("هدف معرفي واحد فقط");
+    expect(titles).not.toContain("قراءة شخصية 10–15 دقيقة");
+    expect(listRoutine().filter((i) => i.title === "سورة البقرة").map((i) => i.id)).toEqual([baq.id]);
+    expect(routineProgress(...W).find((p) => p.item.id === baq.id)?.cycle).toBe(2);
   });
   it("energy is one per day and can change", () => {
     setEnergy("2026-10-05", "YELLOW");
@@ -143,3 +187,6 @@ describe("daily routine", () => {
     expect(getEnergy("2026-10-06")).toBeNull();
   });
 });
+
+import { eq } from "drizzle-orm";
+const eqId = (id: number) => eq(routineItems.id, id);

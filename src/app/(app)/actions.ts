@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import {
   addEvent, addIdea, addOutcome, addTask, archiveEvent, archiveIdea, archiveOutcome, archiveTask,
-  archiveRoutineItem, getSettings, listOutcomes, saveFocus, savePlan, saveRoutineItem, saveSettings,
+  archiveRoutineItem, getSettings, saveHabit, listOutcomes, saveFocus, savePlan, saveRoutineItem, saveSettings,
   setEnergy, setOutcomeStatus, setRoutineCheck, setTaskStatus,
 } from "@/db/repo";
 import { ENERGIES, type EnergyLevel } from "@/db/schema";
@@ -11,7 +11,7 @@ import type { PlanLevel } from "@/db/schema";
 import { LIFE_AREAS } from "@/lib/areas";
 import { periodRef } from "@/lib/periods";
 import { formatDateAr, parseISODate, startOfWeek, todayIn, toISODate } from "@/lib/time/calendar";
-import { validateCapture, validateEvent, validateFocus, validatePlan, validateRoutine, validateSettings, type Errors } from "@/lib/validate";
+import { validateCapture, validateEvent, validateFocus, validateHabit, validatePlan, validateRoutine, validateSettings, type Errors } from "@/lib/validate";
 
 export interface FormState {
   ok?: boolean;
@@ -161,7 +161,8 @@ const isDay = (v: FormDataEntryValue | null): v is string => typeof v === "strin
 export async function toggleRoutineAction(form: FormData) {
   const id = idOf(form);
   const date = form.get("date");
-  if (id && isDay(date)) setRoutineCheck(id, date, form.get("done") === "1");
+  const pick = Number(form.get("pick")) || null;
+  if (id && isDay(date)) setRoutineCheck(id, date, form.get("done") === "1", pick);
   revalidatePath("/", "layout");
 }
 
@@ -183,4 +184,11 @@ export async function archiveRoutineAction(form: FormData) {
   const id = idOf(form);
   if (id) archiveRoutineItem(id);
   revalidatePath("/", "layout");
+}
+
+export async function saveHabitAction(id: number | null, _prev: FormState, form: FormData): Promise<FormState> {
+  const result = validateHabit(Object.fromEntries(form));
+  if (!result.ok) return { errors: result.errors };
+  saveHabit(id, result.value);
+  return done();
 }

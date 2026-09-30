@@ -66,7 +66,7 @@ test("knowledge and assets have one home only", async ({ page }) => {
   await expect(page).toHaveURL(/\/assets$/);
 });
 
-test("Quick Capture opens with Ctrl+K, validates, and closes with Escape", async ({ page }) => {
+test("Quick Capture opens with Ctrl+K, validates, saves, and closes with Escape", async ({ page }) => {
   await page.goto("/", { waitUntil: "networkidle" }); // shortcut listens once the page is interactive
   await page.keyboard.press("Control+k");
   const dialog = page.getByRole("dialog", { name: /التدوين السريع/ });
@@ -79,7 +79,7 @@ test("Quick Capture opens with Ctrl+K, validates, and closes with Escape", async
   await dialog.getByRole("textbox").fill("فكرة كتاب عن القيادة");
   await dialog.getByRole("radio", { name: "مهمة" }).click();
   await dialog.getByRole("button", { name: "دوِّني" }).click();
-  await expect(dialog.getByText(/لم تُحفظ بعد/)).toBeVisible();
+  await expect(dialog.getByTestId("capture-note")).toHaveText(/حُفظت مهمة/);
   await page.keyboard.press("Escape");
   await expect(dialog).toBeHidden();
 });

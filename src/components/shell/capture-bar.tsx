@@ -9,7 +9,7 @@ export function CaptureBar() {
   return (
     <button
       type="button"
-      onClick={open}
+      onClick={() => open()}
       className="flex w-full items-center gap-3 rounded-lg border border-border bg-surface px-5 py-4 text-start text-sm text-ink-3 transition-colors hover:border-border-strong hover:text-ink-2"
     >
       <Plus className="size-4" aria-hidden />

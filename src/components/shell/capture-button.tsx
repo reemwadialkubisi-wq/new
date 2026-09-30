@@ -2,12 +2,12 @@
 
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useQuickCapture } from "./quick-capture";
+import { useQuickCapture, type CaptureKind } from "./quick-capture";
 
-export function CaptureButton({ label = "تدوين" }: { label?: string }) {
+export function CaptureButton({ label = "تدوين", kind, size }: { label?: string; kind?: CaptureKind; size?: "sm" | "md" }) {
   const { open } = useQuickCapture();
   return (
-    <Button variant="primary" onClick={open}>
+    <Button variant={size === "sm" ? "ghost" : "primary"} size={size} onClick={() => open(kind)}>
       <Plus aria-hidden />
       {label}
     </Button>

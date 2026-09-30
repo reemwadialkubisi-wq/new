@@ -102,3 +102,59 @@ export const events = sqliteTable(
 export type PeriodPlan = typeof periodPlans.$inferSelect;
 export type AreaFocus = typeof areaFocus.$inferSelect;
 export type Event = typeof events.$inferSelect;
+
+/* Quick Capture destinations (brought forward from Phase 3 at Reem's request, 30 Sep 2026). */
+
+export const IDEA_STATUSES = ["inbox", "incubator", "kept", "done"] as const;
+
+/** The one Idea Inbox. Ideas never become projects on their own. */
+export const ideas = sqliteTable("ideas", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  title: text("title").notNull(),
+  note: text("note").notNull().default(""),
+  status: text("status", { enum: IDEA_STATUSES }).notNull().default("inbox"),
+  area: text("area"),
+  ...timestamps,
+  archivedAt: text("archived_at"),
+});
+
+export const TASK_STATUSES = ["open", "done", "skipped", "moved", "paused"] as const;
+export type TaskStatus = (typeof TASK_STATUSES)[number];
+
+/** Daily actions. Never "overdue": Phase 3 adds Skip / Move / Pause. */
+export const tasks = sqliteTable(
+  "tasks",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    title: text("title").notNull(),
+    date: text("date"), // null = not planned for a day yet
+    status: text("status", { enum: TASK_STATUSES }).notNull().default("open"),
+    tier: text("tier", { enum: TIERS }).notNull().default("should"),
+    area: text("area"),
+    ...timestamps,
+    archivedAt: text("archived_at"),
+  },
+  (t) => [index("tasks_date").on(t.date)],
+);
+
+export const OUTCOME_STATUSES = ["open", "achieved", "partly", "moved", "dropped"] as const;
+export type OutcomeStatus = (typeof OUTCOME_STATUSES)[number];
+
+/** Results for one week (at most `capacity.weeklyOutcomes`, 5 by default). */
+export const weeklyOutcomes = sqliteTable(
+  "weekly_outcomes",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    weekStart: text("week_start").notNull(),
+    title: text("title").notNull(),
+    status: text("status", { enum: OUTCOME_STATUSES }).notNull().default("open"),
+    area: text("area"),
+    ...timestamps,
+    archivedAt: text("archived_at"),
+  },
+  (t) => [index("weekly_outcomes_week").on(t.weekStart)],
+);
+
+export type Idea = typeof ideas.$inferSelect;
+export type Task = typeof tasks.$inferSelect;
+export type WeeklyOutcome = typeof weeklyOutcomes.$inferSelect;

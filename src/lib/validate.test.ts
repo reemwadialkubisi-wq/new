@@ -67,3 +67,22 @@ describe("validateSettings", () => {
     if (!r.ok) expect(Object.keys(r.errors).sort()).toEqual(["activeProjects", "red", "timeZone"]);
   });
 });
+
+import { validateCapture } from "./validate";
+
+describe("validateCapture", () => {
+  it("idea keeps the first line as title and the rest as a note", () => {
+    expect(validateCapture({ kind: "idea", text: "عنوان\nتفاصيل\nأكثر" })).toEqual({
+      ok: true, value: { kind: "idea", title: "عنوان", note: "تفاصيل\nأكثر", date: null },
+    });
+  });
+  it("other types become one line", () => {
+    expect(validateCapture({ kind: "task", text: "اتصال\nبالمدرسة" })).toMatchObject({ ok: true, value: { title: "اتصال بالمدرسة", note: "" } });
+  });
+  it("needs text, a known type, and a date for «موعد»", () => {
+    const r = validateCapture({ kind: "date", text: " " });
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(Object.keys(r.errors).sort()).toEqual(["date", "text"]);
+    expect(validateCapture({ kind: "nope", text: "x" }).ok).toBe(false);
+  });
+});

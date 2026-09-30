@@ -99,7 +99,7 @@ tests/e2e/                   Playwright specs; src/**/*.test.ts Vitest
 
 ## 6. What is built
 
-**Phase 1 (approved 30 Sep 2026):** design tokens and components; sidebar with 6 collapsible groups (remembered) and icon rail; time bar on every page; Quick Capture dialog (does not save yet: Phase 3); dark/light theme; responsive shell (drawer below 1024px, bottom bar below 768px); designed empty page for every route, each saying which phase fills it.
+**Phase 1 (approved 30 Sep 2026):** design tokens and components; sidebar with 6 collapsible groups (remembered) and icon rail; time bar on every page; Quick Capture dialog; dark/light theme; responsive shell (drawer below 1024px, bottom bar below 768px); designed empty page for every route, each saying which phase fills it.
 
 **Phase 2 (built 30 Sep 2026, awaiting Reem's approval):**
 - Local SQLite database, created automatically on first run; migrations run on startup. A fresh database is seeded with the Q4 2026 plan (quarter theme, 4 priorities, area focus, Oct/Nov/Dec themes, 2 important dates). `REEM_SEED=off` skips it.
@@ -109,8 +109,9 @@ tests/e2e/                   Playwright specs; src/**/*.test.ts Vitest
 - Important Dates (Event): important date / deadline / travel / appointment, optional end date, optional yearly repeat, optional life area. Hiding archives (never deletes).
 - Settings are editable and stored: week start (Sat/Sun/Mon), time zone, all capacity limits. Backup: Settings → download JSON (`/api/backup`).
 - Plans, focus and events are edited in place (Edit button on each card). Errors are in Arabic and keep what was typed.
+- **Quick Capture saves (brought forward from Phase 3 at Reem's request, 30 Sep 2026).** Ctrl/⌘K → Idea (default) goes to the one Idea Inbox on `/ideas` (first line = title, other lines = note); Task goes to a chosen day (default today) or no day, shown on `/today` (today, «بلا تاريخ», and earlier ones still open, never called overdue) and on the week page; Outcome goes to this week's Weekly Outcomes on the week page (over the capacity limit it saves and shows the calm Anti-Overload line); Date goes to Important Dates. Tasks and outcomes can be marked done and hidden (archived). Tables: `ideas`, `tasks`, `weekly_outcomes` (migration 0001). Still for Phase 3: Skip / Move / Pause, Big 3, energy, idea triage and Incubator, week theme and buffer.
 
-Tests (all passing): 36 Vitest (calendar, navigation, period dates, validation, database: seed, plan upsert, focus replace, yearly and multi-day events, archive, settings) + 151 Playwright across desktop/tablet/phone (Phase 1 suite + seeded Q4 plan, save and reload, errors keep input, month → quarter flow, area focus, events add/validate/hide, archive read-only, settings, backup, side-column form fits at 1024px). E2E uses its own database file.
+Tests (all passing): 42 Vitest (calendar, navigation, period dates, validation, database: seed, plan upsert, focus replace, yearly and multi-day events, archive, settings) + 169 Playwright across desktop/tablet/phone (Phase 1 suite + seeded Q4 plan, save and reload, errors keep input, month → quarter flow, area focus, events add/validate/hide, archive read-only, settings, backup, side-column form fits at 1024px, Quick Capture for all four types and where each lands). E2E uses its own database file.
 
 ## 7. Commands
 
@@ -137,4 +138,4 @@ The Ctrl+K test waits for `networkidle` because the shortcut listens only after 
 ## 9. Next steps
 
 1. Get Reem's **approval of Phase 2** (she runs it locally: `git pull`, `npm install`, `npm run dev`).
-2. Only then start **Phase 3 — Week & Today**: week plan (theme, Weekly Outcomes ≤5, buffer), Today (energy GREEN/YELLOW/RED, Big 3, tasks, appointments), Skip / Move / Pause (no Overdue), light Daily Checkout and Weekly Review, Habits basics, Anti-Overload basics, Quick Capture saving. Test, then stop for approval again.
+2. Only then start **Phase 3 — Week & Today**: week plan (theme, Weekly Outcomes ≤5, buffer), Today (energy GREEN/YELLOW/RED, Big 3, tasks, appointments), Skip / Move / Pause (no Overdue), light Daily Checkout and Weekly Review, Habits basics, Anti-Overload basics, idea triage. (Quick Capture saving already exists.) Test, then stop for approval again.

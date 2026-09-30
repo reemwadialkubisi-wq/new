@@ -1,11 +1,14 @@
 import "server-only";
-import { and, asc, eq, gte, inArray, isNull, lte, or } from "drizzle-orm";
+import { and, asc, desc, eq, gte, inArray, isNull, lt, lte, or } from "drizzle-orm";
 import { DEFAULT_SETTINGS, type AppSettings } from "@/lib/config";
 import type { PeriodRef } from "@/lib/periods";
 import type { Weekday } from "@/lib/time/calendar";
 import type { EventInput, FocusInput, PlanInput, SettingsInput } from "@/lib/validate";
 import { getDb } from "./index";
-import { areaFocus, events, periodPlans, settings, type Event, type PeriodPlan, type PlanLevel } from "./schema";
+import {
+  areaFocus, events, ideas, periodPlans, settings, tasks, weeklyOutcomes,
+  type Event, type OutcomeStatus, type PeriodPlan, type PlanLevel, type TaskStatus,
+} from "./schema";
 
 const now = () => new Date().toISOString().slice(0, 19).replace("T", " ");
 
@@ -122,6 +125,81 @@ export function archiveEvent(id: number) {
   getDb().update(events).set({ archivedAt: now(), updatedAt: now() }).where(eq(events.id, id)).run();
 }
 
+/* Ideas (the one Idea Inbox) */
+
+export function addIdea(v: { title: string; note: string }) {
+  return getDb().insert(ideas).values(v).returning().get();
+}
+
+export function listIdeas() {
+  return getDb().select().from(ideas).where(isNull(ideas.archivedAt)).orderBy(desc(ideas.createdAt), desc(ideas.id)).all();
+}
+
+export function archiveIdea(id: number) {
+  getDb().update(ideas).set({ archivedAt: now(), updatedAt: now() }).where(eq(ideas.id, id)).run();
+}
+
+/* Tasks */
+
+export function addTask(v: { title: string; date: string | null }) {
+  return getDb().insert(tasks).values(v).returning().get();
+}
+
+/** Tasks for one day, plus the ones with no day yet and earlier ones still open (never called "overdue"). */
+export function tasksForDay(day: string) {
+  const rows = getDb()
+    .select()
+    .from(tasks)
+    .where(and(isNull(tasks.archivedAt), or(eq(tasks.date, day), isNull(tasks.date), and(lt(tasks.date, day), eq(tasks.status, "open")))))
+    .orderBy(asc(tasks.date), asc(tasks.id))
+    .all();
+  return {
+    today: rows.filter((t) => t.date === day),
+    undated: rows.filter((t) => t.date === null),
+    earlier: rows.filter((t) => t.date !== null && t.date < day),
+  };
+}
+
+export function tasksBetween(from: string, to: string) {
+  return getDb()
+    .select()
+    .from(tasks)
+    .where(and(isNull(tasks.archivedAt), gte(tasks.date, from), lte(tasks.date, to)))
+    .orderBy(asc(tasks.date), asc(tasks.id))
+    .all();
+}
+
+export function setTaskStatus(id: number, status: TaskStatus) {
+  getDb().update(tasks).set({ status, updatedAt: now() }).where(eq(tasks.id, id)).run();
+}
+
+export function archiveTask(id: number) {
+  getDb().update(tasks).set({ archivedAt: now(), updatedAt: now() }).where(eq(tasks.id, id)).run();
+}
+
+/* Weekly outcomes */
+
+export function addOutcome(v: { weekStart: string; title: string }) {
+  return getDb().insert(weeklyOutcomes).values(v).returning().get();
+}
+
+export function listOutcomes(weekStart: string) {
+  return getDb()
+    .select()
+    .from(weeklyOutcomes)
+    .where(and(eq(weeklyOutcomes.weekStart, weekStart), isNull(weeklyOutcomes.archivedAt)))
+    .orderBy(asc(weeklyOutcomes.id))
+    .all();
+}
+
+export function setOutcomeStatus(id: number, status: OutcomeStatus) {
+  getDb().update(weeklyOutcomes).set({ status, updatedAt: now() }).where(eq(weeklyOutcomes.id, id)).run();
+}
+
+export function archiveOutcome(id: number) {
+  getDb().update(weeklyOutcomes).set({ archivedAt: now(), updatedAt: now() }).where(eq(weeklyOutcomes.id, id)).run();
+}
+
 /* Backup */
 
 export function exportAll() {
@@ -133,5 +211,8 @@ export function exportAll() {
     periodPlans: db.select().from(periodPlans).all(),
     areaFocus: db.select().from(areaFocus).all(),
     events: db.select().from(events).all(),
+    ideas: db.select().from(ideas).all(),
+    tasks: db.select().from(tasks).all(),
+    weeklyOutcomes: db.select().from(weeklyOutcomes).all(),
   };
 }

@@ -68,3 +68,33 @@ describe("settings", () => {
     expect(getSettings()).toMatchObject({ weekStart: 0, timeZone: "Europe/London", capacity: { activeProjects: 2 } });
   });
 });
+
+import { addIdea, addOutcome, addTask, archiveIdea, listIdeas, listOutcomes, setOutcomeStatus, setTaskStatus, tasksBetween, tasksForDay } from "./repo";
+
+describe("quick capture destinations", () => {
+  it("ideas: newest first, hidden ones leave the inbox", () => {
+    const a = addIdea({ title: "أ", note: "" });
+    addIdea({ title: "ب", note: "تفاصيل" });
+    expect(listIdeas().map((i) => i.title).slice(0, 2)).toEqual(["ب", "أ"]);
+    archiveIdea(a.id);
+    expect(listIdeas().map((i) => i.title)).not.toContain("أ");
+  });
+  it("tasks: today, undated, and earlier ones still open", () => {
+    addTask({ title: "اليوم", date: "2030-01-10" });
+    addTask({ title: "بلا تاريخ", date: null });
+    const old = addTask({ title: "قديمة", date: "2030-01-05" });
+    const closed = addTask({ title: "قديمة منجزة", date: "2030-01-04" });
+    setTaskStatus(closed.id, "done");
+    const t = tasksForDay("2030-01-10");
+    expect(t.today.map((x) => x.title)).toEqual(["اليوم"]);
+    expect(t.undated.map((x) => x.title)).toContain("بلا تاريخ");
+    expect(t.earlier.map((x) => x.id)).toEqual([old.id]);
+    expect(tasksBetween("2030-01-04", "2030-01-10")).toHaveLength(3);
+  });
+  it("weekly outcomes belong to one week", () => {
+    const o = addOutcome({ weekStart: "2030-01-05", title: "مسودة" });
+    addOutcome({ weekStart: "2030-01-12", title: "أخرى" });
+    setOutcomeStatus(o.id, "achieved");
+    expect(listOutcomes("2030-01-05")).toMatchObject([{ title: "مسودة", status: "achieved" }]);
+  });
+});

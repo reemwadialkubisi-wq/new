@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
-import { CalendarClock, Target, NotebookPen, Hourglass } from "lucide-react";
+import { Target, NotebookPen, Hourglass } from "lucide-react";
 import { Card, Section, SectionTitle } from "@/components/ui/card";
 import { MainWithRail, PageHeader, PeriodNav } from "@/components/ui/page-header";
 import { Planned } from "@/components/ui/planned";
-import { getSettings } from "@/db/repo";
+import { getSettings, listOutcomes, tasksBetween } from "@/db/repo";
+import { EventsSection } from "@/components/plan/sections";
+import { OutcomeList, TaskList } from "@/components/plan/items";
+import { EmptyState } from "@/components/ui/empty-state";
+import { CaptureButton } from "@/components/shell/capture-button";
 import {
   MONTHS_AR, WEEKDAYS_AR, addDays, formatRangeAr, parseISODate, sameDay, toISODate, weekInfo,
 } from "@/lib/time/calendar";
@@ -27,6 +31,11 @@ export default async function WeekPage({ params }: Props) {
   if (!sameDay(w.start, d)) redirect(`/week/${toISODate(w.start)}`);
   const now = currentPeriods();
   const days = Array.from({ length: 7 }, (_, i) => addDays(w.start, i));
+  const from = toISODate(w.start);
+  const to = toISODate(w.end);
+  const outcomes = listOutcomes(from);
+  const weekTasks = tasksBetween(from, to);
+  const maxOutcomes = getSettings().capacity.weeklyOutcomes;
 
   return (
     <>
@@ -75,9 +84,26 @@ export default async function WeekPage({ params }: Props) {
             <Section title="عنوان الأسبوع · Theme">
               <p className="text-sm text-ink-3">لا يوجد عنوان بعد. عبارة قصيرة تحدد روح الأسبوع.</p>
             </Section>
-            <Planned title="نتائج الأسبوع · Weekly Outcomes" meta="حتى 5" empty="لا توجد نتائج لهذا الأسبوع" icon={Target} phase={3}>
-              نتائج وليست مهام. أسبوع بنسبة 70–80% أسبوع قوي.
-            </Planned>
+            <Section
+              title="نتائج الأسبوع · Weekly Outcomes"
+              meta={<span className="tabular-nums">{outcomes.length} من {maxOutcomes}</span>}
+            >
+              {outcomes.length ? (
+                <OutcomeList items={outcomes} />
+              ) : (
+                <EmptyState compact icon={Target} title="لا توجد نتائج لهذا الأسبوع">
+                  نتائج وليست مهام. دوّنيها بالاختصار Ctrl K واختاري «نتيجة». أسبوع بنسبة 70–80% أسبوع قوي.
+                </EmptyState>
+              )}
+              {outcomes.length > maxOutcomes ? (
+                <p className="mt-3 text-xs text-ink-2">حملك الحالي قد يتجاوز طاقتك المتاحة. يمكنك نقل نتيجة أو إيقافها مؤقتًا.</p>
+              ) : null}
+            </Section>
+            {weekTasks.length ? (
+              <Section title="مهام الأسبوع" meta={<CaptureButton label="مهمة" kind="task" size="sm" />}>
+                <TaskList items={weekTasks} showDate testId="tasks-week" />
+              </Section>
+            ) : null}
             <Section title="تركيز المجالات · Area Focus">
               <ul className="grid grid-cols-1 gap-x-8 sm:grid-cols-2">
                 {WEEK_AREAS.map((a) => (
@@ -92,7 +118,7 @@ export default async function WeekPage({ params }: Props) {
         }
         rail={
           <>
-            <Planned title="المواعيد" empty="لا توجد مواعيد هذا الأسبوع" icon={CalendarClock} phase={3} />
+            <EventsSection from={from} to={to} defaultDate={from} title="المواعيد والتواريخ" />
             <Planned title="وقت احتياطي · Buffer" empty="لا يوجد وقت احتياطي محجوز" icon={Hourglass} phase={3}>اتركي مساحة لما لا يُتوقع.</Planned>
             <Planned title="المراجعة الأسبوعية · Weekly Review" meta="الجمعة · ≈ 20 د" empty="تُفتح يوم الجمعة" icon={NotebookPen} phase={3}>
               التقدم، الطاقة، الإنجازات، التحديات، ما يتوقف، ما يستمر، أولويات الأسبوع القادم.

@@ -51,7 +51,7 @@ export function TimeBar({ data, authConfigured }: { data: TimeBarData; authConfi
         </nav>
         <button
           type="button"
-          onClick={open}
+          onClick={() => open()}
           className="hidden h-8 shrink-0 items-center gap-2 rounded-md border border-border-strong bg-surface px-2.5 text-xs text-ink-3 transition-colors hover:text-ink sm:inline-flex"
         >
           <Plus className="size-3.5" aria-hidden />

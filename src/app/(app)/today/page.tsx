@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
-import { CalendarClock, Repeat, Sparkles, MoonStar } from "lucide-react";
-import { Card, SectionTitle } from "@/components/ui/card";
+import { CheckSquare, Repeat, Sparkles, MoonStar } from "lucide-react";
+import { Card, Section, SectionTitle } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
+import { CaptureButton } from "@/components/shell/capture-button";
+import { EventsSection } from "@/components/plan/sections";
+import { TaskList } from "@/components/plan/items";
+import { tasksForDay } from "@/db/repo";
 import { MainWithRail, PageHeader } from "@/components/ui/page-header";
 import { ENERGY, type Energy } from "@/components/ui/status";
 import { Planned } from "@/components/ui/planned";
-import { formatDayLongAr } from "@/lib/time/calendar";
+import { formatDayLongAr, toISODate } from "@/lib/time/calendar";
 import { currentPeriods } from "@/lib/time/current";
 import { cn } from "@/lib/utils";
 
@@ -18,6 +23,9 @@ const BIG3 = [
 
 export default function TodayPage() {
   const now = currentPeriods();
+  const day = toISODate(now.today);
+  const t = tasksForDay(day);
+  const none = !t.today.length && !t.undated.length && !t.earlier.length;
   return (
     <>
       <PageHeader
@@ -58,6 +66,30 @@ export default function TodayPage() {
                 ))}
               </ol>
             </Card>
+            <Section title="المهام · Tasks" meta={<CaptureButton label="مهمة" kind="task" size="sm" />}>
+              {none ? (
+                <EmptyState compact icon={CheckSquare} title="لا توجد مهام مدوّنة">
+                  دوّني مهمة بالاختصار Ctrl K واختاري «مهمة».
+                </EmptyState>
+              ) : (
+                <div className="space-y-5">
+                  {t.today.length ? <TaskList items={t.today} testId="tasks-today" /> : null}
+                  {t.undated.length ? (
+                    <div>
+                      <h3 className="text-2xs font-semibold text-ink-3">بلا تاريخ</h3>
+                      <TaskList items={t.undated} testId="tasks-undated" />
+                    </div>
+                  ) : null}
+                  {t.earlier.length ? (
+                    <div>
+                      <h3 className="text-2xs font-semibold text-ink-3">من أيام سابقة، ما زالت مفتوحة</h3>
+                      <TaskList items={t.earlier} showDate testId="tasks-earlier" />
+                    </div>
+                  ) : null}
+                  <p className="text-2xs text-ink-4">تخطٍّ بلا لوم · نقل بقصد · إيقاف مؤقت: تأتي في المرحلة 3.</p>
+                </div>
+              )}
+            </Section>
             <Planned title="تطوير اختياري · Optional" empty="لا يوجد شيء اختياري مخطط" icon={Sparkles} phase={3}>
               العناصر الاختيارية تتكيف مع طاقتك: 7 في GREEN، و4 في YELLOW، و1 في RED. غير المنجز منها لا يصبح متأخرًا أبدًا.
             </Planned>
@@ -66,7 +98,7 @@ export default function TodayPage() {
         rail={
           <>
             <Planned title="الروتين · Routine" empty="لا يوجد روتين بعد" icon={Repeat} phase={5}>روتين الصباح والمساء كخطوات بسيطة.</Planned>
-            <Planned title="المواعيد" empty="لا توجد مواعيد اليوم" icon={CalendarClock} phase={3} />
+            <EventsSection from={day} to={day} defaultDate={day} title="المواعيد والتواريخ · Today" />
             <Planned title="إغلاق اليوم · Daily Checkout" meta="≤ 2 د" empty="أغلقي اليوم بهدوء" icon={MoonStar} phase={3}>
               تم · تخطٍّ بلا لوم · نقل بقصد · إيقاف مؤقت.
             </Planned>

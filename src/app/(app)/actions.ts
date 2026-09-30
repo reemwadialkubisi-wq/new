@@ -1,11 +1,15 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { addEvent, archiveEvent, saveFocus, savePlan, saveSettings } from "@/db/repo";
+import {
+  addEvent, addIdea, addOutcome, addTask, archiveEvent, archiveIdea, archiveOutcome, archiveTask,
+  getSettings, listOutcomes, saveFocus, savePlan, saveSettings, setOutcomeStatus, setTaskStatus,
+} from "@/db/repo";
 import type { PlanLevel } from "@/db/schema";
 import { LIFE_AREAS } from "@/lib/areas";
 import { periodRef } from "@/lib/periods";
-import { validateEvent, validateFocus, validatePlan, validateSettings, type Errors } from "@/lib/validate";
+import { formatDateAr, parseISODate, startOfWeek, todayIn, toISODate } from "@/lib/time/calendar";
+import { validateCapture, validateEvent, validateFocus, validatePlan, validateSettings, type Errors } from "@/lib/validate";
 
 export interface FormState {
   ok?: boolean;
@@ -69,4 +73,81 @@ export async function saveSettingsAction(_prev: FormState, form: FormData): Prom
   if (!result.ok) return { errors: result.errors };
   saveSettings(result.value);
   return done();
+}
+
+/* Quick Capture */
+
+export interface CaptureResult {
+  ok?: boolean;
+  /** Where it went, in plain Arabic. */
+  message?: string;
+  errors?: Errors;
+}
+
+export async function captureAction(input: { kind: string; text: string; date?: string }): Promise<CaptureResult> {
+  const result = validateCapture(input);
+  if (!result.ok) return { errors: result.errors };
+  const { kind, title, note, date } = result.value;
+  const settings = getSettings();
+  const today = todayIn(settings.timeZone);
+  let message: string;
+
+  if (kind === "idea") {
+    addIdea({ title, note });
+    message = "حُفظت في صندوق الأفكار.";
+  } else if (kind === "task") {
+    addTask({ title, date });
+    message = date ? `حُفظت مهمة ليوم ${formatDateAr(parseISODate(date)!)}.` : "حُفظت مهمة بلا تاريخ، وتظهر في صفحة اليوم.";
+  } else if (kind === "outcome") {
+    const weekStart = toISODate(startOfWeek(today, settings.weekStart));
+    addOutcome({ weekStart, title });
+    const count = listOutcomes(weekStart).length;
+    const max = settings.capacity.weeklyOutcomes;
+    message =
+      count > max
+        ? `حُفظت. هذا الأسبوع فيه الآن ${count} نتائج، والحد الذي اخترتِه ${max}. قد يتجاوز الحمل طاقتك المتاحة؛ يمكنك نقل واحدة لاحقًا.`
+        : `حُفظت في نتائج هذا الأسبوع (${count} من ${max}).`;
+  } else {
+    addEvent({ title, kind: "important_date", date: date!, endDate: null, yearly: false, area: null });
+    message = `حُفظ في التواريخ المهمة: ${formatDateAr(parseISODate(date!)!)}.`;
+  }
+  revalidatePath("/", "layout");
+  return { ok: true, message };
+}
+
+/* Small item actions (forms with a hidden id) */
+
+const idOf = (form: FormData) => {
+  const id = Number(form.get("id"));
+  return Number.isInteger(id) && id > 0 ? id : null;
+};
+
+export async function toggleTaskAction(form: FormData) {
+  const id = idOf(form);
+  if (id) setTaskStatus(id, form.get("done") === "1" ? "done" : "open");
+  revalidatePath("/", "layout");
+}
+
+export async function archiveTaskAction(form: FormData) {
+  const id = idOf(form);
+  if (id) archiveTask(id);
+  revalidatePath("/", "layout");
+}
+
+export async function toggleOutcomeAction(form: FormData) {
+  const id = idOf(form);
+  if (id) setOutcomeStatus(id, form.get("done") === "1" ? "achieved" : "open");
+  revalidatePath("/", "layout");
+}
+
+export async function archiveOutcomeAction(form: FormData) {
+  const id = idOf(form);
+  if (id) archiveOutcome(id);
+  revalidatePath("/", "layout");
+}
+
+export async function archiveIdeaAction(form: FormData) {
+  const id = idOf(form);
+  if (id) archiveIdea(id);
+  revalidatePath("/", "layout");
 }

@@ -60,7 +60,7 @@ export function BottomBar() {
           {label}
         </Link>
       ))}
-      <button type="button" onClick={open} className={cn(cls, "text-ink-3")}>
+      <button type="button" onClick={() => open()} className={cn(cls, "text-ink-3")}>
         <Plus className="size-5" aria-hidden />
         تدوين
       </button>

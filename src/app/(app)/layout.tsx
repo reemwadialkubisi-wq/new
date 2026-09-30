@@ -3,6 +3,7 @@ import { TimeBar } from "@/components/shell/time-bar";
 import { BottomBar } from "@/components/shell/mobile-nav";
 import { QuickCaptureProvider } from "@/components/shell/quick-capture";
 import { authConfigured } from "@/lib/config";
+import { toISODate } from "@/lib/time/calendar";
 import { currentPeriods } from "@/lib/time/current";
 
 // "Today" must be computed per request, never frozen at build time.
@@ -11,7 +12,7 @@ export const dynamic = "force-dynamic";
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const now = currentPeriods();
   return (
-    <QuickCaptureProvider>
+    <QuickCaptureProvider today={toISODate(now.today)}>
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-surface focus:px-3 focus:py-2">
         تخطي إلى المحتوى
       </a>

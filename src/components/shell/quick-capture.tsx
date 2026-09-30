@@ -1,31 +1,38 @@
 "use client";
 
 import * as Dialog from "@radix-ui/react-dialog";
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { createContext, useCallback, useContext, useEffect, useRef, useState, useTransition } from "react";
+import { captureAction } from "@/app/(app)/actions";
 import { CalendarClock, CheckSquare, Lightbulb, Target, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Kbd } from "@/components/ui/status";
 import { cn } from "@/lib/utils";
 
-type CaptureKind = "idea" | "task" | "outcome" | "date";
+export type CaptureKind = "idea" | "task" | "outcome" | "date";
 const KINDS: { value: CaptureKind; label: string; icon: typeof Lightbulb; lands: string }[] = [
   { value: "idea", label: "فكرة", icon: Lightbulb, lands: "تذهب إلى صندوق الأفكار، ولا تتحول إلى مشروع من تلقاء نفسها." },
   { value: "task", label: "مهمة", icon: CheckSquare, lands: "تذهب إلى اليوم، أو إلى يوم تختارينه." },
   { value: "outcome", label: "نتيجة", icon: Target, lands: "تصبح Weekly Outcome لهذا الأسبوع." },
-  { value: "date", label: "موعد", icon: CalendarClock, lands: "موعد أو تاريخ مهم أو موعد نهائي." },
+  { value: "date", label: "موعد", icon: CalendarClock, lands: "يذهب إلى التواريخ المهمة، ويظهر في الأسبوع والشهر والسنة." },
 ];
 
-const Ctx = createContext<{ open: () => void }>({ open: () => {} });
+const Ctx = createContext<{ open: (kind?: CaptureKind) => void }>({ open: () => {} });
 export const useQuickCapture = () => useContext(Ctx);
 
-export function QuickCaptureProvider({ children }: { children: React.ReactNode }) {
+export function QuickCaptureProvider({ children, today }: { children: React.ReactNode; today: string }) {
   const [isOpen, setOpen] = useState(false);
-  const open = useCallback(() => setOpen(true), []);
+  const [startKind, setStartKind] = useState<CaptureKind>("idea");
+  const open = useCallback((kind: CaptureKind = "idea") => {
+    setStartKind(kind);
+    setOpen(true);
+  }, []);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
+        setStartKind("idea");
         setOpen((v) => !v);
       }
     };
@@ -36,36 +43,54 @@ export function QuickCaptureProvider({ children }: { children: React.ReactNode }
   return (
     <Ctx.Provider value={{ open }}>
       {children}
-      <QuickCaptureDialog open={isOpen} onOpenChange={setOpen} />
+      <QuickCaptureDialog open={isOpen} onOpenChange={setOpen} today={today} startKind={startKind} />
     </Ctx.Provider>
   );
 }
 
-function QuickCaptureDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
+function QuickCaptureDialog({
+  open, onOpenChange, today, startKind,
+}: { open: boolean; onOpenChange: (v: boolean) => void; today: string; startKind: CaptureKind }) {
   const [kind, setKind] = useState<CaptureKind>("idea");
   const [text, setText] = useState("");
-  const [note, setNote] = useState<string | null>(null);
+  const [date, setDate] = useState(today);
+  const [note, setNote] = useState<{ text: string; tone: "ok" | "error" } | null>(null);
+  const [pending, startTransition] = useTransition();
+  const router = useRouter();
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (open) {
-      setKind("idea");
+      setKind(startKind);
       setNote(null);
+      setDate(today);
     }
-  }, [open]);
+  }, [open, today, startKind]);
 
   const current = KINDS.find((k) => k.value === kind)!;
 
+  const withDate = kind === "task" || kind === "date";
+
   function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (pending) return;
     if (!text.trim()) {
-      setNote("اكتبي بضع كلمات أولًا.");
+      setNote({ text: "اكتبي بضع كلمات أولًا.", tone: "error" });
       inputRef.current?.focus();
       return;
     }
-    // Saving captures arrives with Today/Tasks (Phase 3) and the Idea Inbox; until then nothing is stored.
-    setNote("لم تُحفظ بعد: حفظ التدوين السريع يأتي في المرحلة 3. التواريخ المهمة تُضاف من صفحة الشهر أو السنة.");
-    setText("");
+    startTransition(async () => {
+      const res = await captureAction({ kind, text, date: withDate ? date : undefined });
+      if (res.ok) {
+        setNote({ text: res.message ?? "حُفظت.", tone: "ok" });
+        setText("");
+        router.refresh();
+        inputRef.current?.focus();
+      } else {
+        const first = Object.values(res.errors ?? {})[0] ?? "لم تُحفظ. حاولي مرة أخرى.";
+        setNote({ text: first, tone: "error" });
+      }
+    });
   }
 
   return (
@@ -96,7 +121,7 @@ function QuickCaptureDialog({ open, onOpenChange }: { open: boolean; onOpenChang
                 value={text}
                 onChange={(e) => {
                   setText(e.target.value);
-                  if (note) setNote(null);
+                  if (note?.tone === "error") setNote(null);
                 }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) submit(e);
@@ -123,11 +148,32 @@ function QuickCaptureDialog({ open, onOpenChange }: { open: boolean; onOpenChang
                 </button>
               ))}
             </div>
+            {withDate ? (
+              <div className="flex items-center gap-3 px-5 pb-3">
+                <label htmlFor="capture-date" className="text-xs text-ink-2">
+                  {kind === "task" ? "اليوم (اختياري)" : "التاريخ"}
+                </label>
+                <input
+                  id="capture-date"
+                  type="date"
+                  dir="ltr"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className="h-8 rounded-md border border-border-strong bg-surface px-2 text-xs text-ink focus:border-accent focus:outline-none"
+                />
+              </div>
+            ) : null}
             <div className="flex flex-col gap-3 border-t border-border bg-surface-2/60 px-5 py-3 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-xs text-ink-3" aria-live="polite">{note ?? current.lands}</p>
+              <p
+                className={cn("text-xs", note?.tone === "error" ? "text-red-text" : note ? "font-medium text-ink" : "text-ink-3")}
+                aria-live="polite"
+                data-testid="capture-note"
+              >
+                {note?.text ?? current.lands}
+              </p>
               <div className="flex shrink-0 items-center gap-2">
                 <span dir="ltr" className="hidden items-center gap-1 text-2xs text-ink-4 sm:inline-flex"><Kbd>Ctrl</Kbd><Kbd>↵</Kbd></span>
-                <Button type="submit" variant="primary" size="sm">دوِّني</Button>
+                <Button type="submit" variant="primary" size="sm" disabled={pending}>{pending ? "جارٍ الحفظ…" : "دوِّني"}</Button>
               </div>
             </div>
           </form>

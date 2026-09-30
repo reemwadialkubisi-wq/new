@@ -104,3 +104,25 @@ export function validateSettings(raw: Record<string, unknown>): Result<SettingsI
     ? { ok: false, errors }
     : { ok: true, value: { weekStart: weekStart as 0 | 1 | 6, timeZone, capacity } };
 }
+
+export const CAPTURE_KINDS = ["idea", "task", "outcome", "date"] as const;
+export type CaptureKind = (typeof CAPTURE_KINDS)[number];
+export interface CaptureInput { kind: CaptureKind; title: string; note: string; date: string | null }
+
+/** Quick Capture: one text box + a type. Ideas keep extra lines as a note; the others are one line. */
+export function validateCapture(raw: { kind?: unknown; text?: unknown; date?: unknown }): Result<CaptureInput> {
+  const errors: Errors = {};
+  const kind = clean(raw.kind) as CaptureKind;
+  const text = clean(raw.text);
+  const date = clean(raw.date) || null;
+  if (!CAPTURE_KINDS.includes(kind)) errors.kind = "اختاري النوع.";
+  const [first = "", ...rest] = text.split("\n");
+  const title = kind === "idea" ? first.trim() : text.replace(/\s*\n\s*/g, " ");
+  const note = kind === "idea" ? rest.join("\n").trim() : "";
+  if (!title) errors.text = "اكتبي بضع كلمات أولًا.";
+  else if (title.length > 200) errors.text = tooLong(200);
+  else if (note.length > 2000) errors.text = tooLong(2000);
+  if (kind === "date" && !date) errors.date = "اختاري التاريخ.";
+  if (date && !parseISODate(date)) errors.date = "هذا التاريخ غير صحيح.";
+  return Object.keys(errors).length ? { ok: false, errors } : { ok: true, value: { kind, title, note, date } };
+}

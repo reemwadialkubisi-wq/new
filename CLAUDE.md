@@ -110,7 +110,7 @@ tests/e2e/                   Playwright specs; src/**/*.test.ts Vitest
 - Settings are editable and stored: week start (Sat/Sun/Mon), time zone, all capacity limits. Backup: Settings → download JSON (`/api/backup`).
 - Plans, focus and events are edited in place (Edit button on each card). Errors are in Arabic and keep what was typed.
 
-Tests (all passing): 36 Vitest (calendar, navigation, period dates, validation, database: seed, plan upsert, focus replace, yearly and multi-day events, archive, settings) + 150 Playwright across desktop/tablet/phone (Phase 1 suite + seeded Q4 plan, save and reload, errors keep input, month → quarter flow, area focus, events add/validate/hide, archive read-only, settings, backup). E2E uses its own database file.
+Tests (all passing): 36 Vitest (calendar, navigation, period dates, validation, database: seed, plan upsert, focus replace, yearly and multi-day events, archive, settings) + 151 Playwright across desktop/tablet/phone (Phase 1 suite + seeded Q4 plan, save and reload, errors keep input, month → quarter flow, area focus, events add/validate/hide, archive read-only, settings, backup, side-column form fits at 1024px). E2E uses its own database file.
 
 ## 7. Commands
 

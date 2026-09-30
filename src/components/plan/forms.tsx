@@ -41,6 +41,7 @@ export function ActionForm({
     <ErrorsContext.Provider value={state.errors ?? {}}>
       <form
         ref={ref}
+        method="post"
         noValidate
         className={cn("space-y-4", className)}
         onSubmit={(e) => {
@@ -109,8 +110,11 @@ export function EditableSection({
   readOnly?: boolean;
 }) {
   const [editing, setEditing] = useState(false);
+  // Until the page is interactive the button can't open the form; show it as not ready yet.
+  const [ready, setReady] = useState(false);
+  useEffect(() => setReady(true), []);
   return (
-    <Card className={cn("p-6", className)}>
+    <Card className={cn("@container p-6", className)}>
       <SectionTitle
         meta={
           <span className="flex items-center gap-3">
@@ -123,7 +127,8 @@ export function EditableSection({
               <button
                 type="button"
                 onClick={() => setEditing(true)}
-                className="inline-flex items-center gap-1 font-medium text-accent-text hover:underline"
+                disabled={!ready}
+                className="inline-flex items-center gap-1 font-medium text-accent-text hover:underline disabled:opacity-40"
                 aria-label={`${editLabel}: ${title}`}
               >
                 <Pencil className="size-3.5" aria-hidden /> {editLabel}

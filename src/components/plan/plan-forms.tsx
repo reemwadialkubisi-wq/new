@@ -61,7 +61,7 @@ export function FocusForm({ action, initial }: { action: Action; initial: Record
       <p className="text-xs text-ink-3">اتركي المجال فارغًا إن كان يستريح في هذه الفترة.</p>
       <ul className="space-y-3">
         {LIFE_AREAS.map((a) => (
-          <li key={a.slug} className="grid grid-cols-1 gap-2 sm:grid-cols-[9rem_1fr_7rem] sm:items-center">
+          <li key={a.slug} className="grid grid-cols-1 gap-2 @lg:grid-cols-[9rem_1fr_7rem] @lg:items-center">
             <label htmlFor={`focus_${a.slug}`} className="text-sm text-ink-2">{a.name}</label>
             <Input
               id={`focus_${a.slug}`}
@@ -75,7 +75,7 @@ export function FocusForm({ action, initial }: { action: Action; initial: Record
                 <option key={v} value={v}>{l}</option>
               ))}
             </Select>
-            <div className="sm:col-span-3"><FieldError name={`focus_${a.slug}`} /></div>
+            <div className="@lg:col-span-3"><FieldError name={`focus_${a.slug}`} /></div>
           </li>
         ))}
       </ul>
@@ -89,7 +89,7 @@ export function EventForm({ action, defaultDate, min, max }: { action: Action; d
       <FormField name="title" label="العنوان">
         <Input name="title" placeholder="مثال: آخر موعد للتقديم" maxLength={200} />
       </FormField>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 @md:grid-cols-2">
         <FormField name="date" label="التاريخ">
           <Input name="date" type="date" dir="ltr" defaultValue={defaultDate} min={min} max={max} />
         </FormField>
@@ -134,7 +134,7 @@ export function SettingsForm({
   );
   return (
     <ActionForm action={action}>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 @md:grid-cols-2">
         <FormField name="weekStart" label="بداية الأسبوع" hint="تغييرها يعيد ترقيم الأسابيع.">
           <Select name="weekStart" defaultValue={String(initial.weekStart)}>
             <option value="6">السبت</option>
@@ -146,14 +146,14 @@ export function SettingsForm({
           <Input name="timeZone" defaultValue={initial.timeZone} dir="ltr" />
         </FormField>
       </div>
-      <fieldset className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <fieldset className="grid grid-cols-2 gap-4 @xl:grid-cols-4">
         <legend className="mb-2 text-xs font-semibold text-ink-3">السعة · Anti-Overload</legend>
         {num("activeAnnualGoals", "الأهداف السنوية النشطة", c.activeAnnualGoals, 10)}
         {num("quarterObjectives", "أهداف الربع", c.quarterObjectives, 10)}
         {num("activeProjects", "المشاريع النشطة", c.activeProjects, 10)}
         {num("weeklyOutcomes", "نتائج الأسبوع", c.weeklyOutcomes, 10)}
       </fieldset>
-      <fieldset className="grid grid-cols-3 gap-4 sm:grid-cols-4">
+      <fieldset className="grid grid-cols-3 gap-4 @xl:grid-cols-4">
         <legend className="mb-2 text-xs font-semibold text-ink-3">العناصر الاختيارية اليومية حسب الطاقة</legend>
         {num("green", "GREEN", c.optionalDaily.GREEN, 15)}
         {num("yellow", "YELLOW", c.optionalDaily.YELLOW, 15)}

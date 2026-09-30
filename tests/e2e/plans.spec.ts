@@ -145,3 +145,18 @@ test("backup downloads everything as JSON", async ({ request }) => {
   expect(data.periodPlans.some((p: { key: string }) => p.key === "2026-q4")).toBe(true);
   expect(Array.isArray(data.events)).toBe(true);
 });
+
+test("at 1024px the side-column date form fits its card", async ({ page }, info) => {
+  test.skip(info.project.name !== "desktop");
+  await page.setViewportSize({ width: 1024, height: 800 });
+  await page.goto("/month/2026-11");
+  await openEditor(page, /إضافة: تواريخ مهمة/);
+  const card = page.getByLabel("التاريخ", { exact: true }).locator("xpath=ancestor::div[contains(@class,'@container')][1]");
+  const cardBox = (await card.boundingBox())!;
+  for (const label of ["التاريخ", "حتى (اختياري)", "النوع"]) {
+    const box = (await page.getByLabel(label, { exact: true }).boundingBox())!;
+    expect(box.width, label).toBeGreaterThan(150);
+    expect(box.x, label).toBeGreaterThanOrEqual(cardBox.x);
+    expect(box.x + box.width, label).toBeLessThanOrEqual(cardBox.x + cardBox.width);
+  }
+});

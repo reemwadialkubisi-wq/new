@@ -15,9 +15,9 @@ Time cost targets: daily use ≤ 5 min, Weekly Review ≈ 20 min, Monthly Review
 - Do not change the approved architecture or design system without a clear reason and Reem's approval.
 - Never create duplicate modules (no Tasks/Actions/Work Items/To-Do variants, no second page doing the same job).
 - Reem writes in Arabic and English. Reply to her in a mix, short and plain, Western digits.
-- Never put secrets in the repo or in chat. Keys live only in Vercel / Supabase settings.
+- Never put secrets in the repo or in chat. Never commit the database file (`data/`).
 
-Phases: 0 Product Architecture (done) · **1 Design System & App Shell (built, awaiting approval)** · 2 Annual / Quarter / Month · 3 Week & Today (+ light Daily Checkout, Weekly Review, Habits basics, Anti-Overload basics) · 4 Goals & Projects · 5 Life Areas · 6 Knowledge / PhD / English · 7 Career / Finance / Intellectual Assets · 8 Review System · 9 Smart Insights & Automation.
+Phases: 0 Product Architecture (done) · 1 Design System & App Shell (approved 30 Sep 2026) · **2 Annual / Quarter / Month (built, awaiting approval)** · 3 Week & Today (+ light Daily Checkout, Weekly Review, Habits basics, Anti-Overload basics) · 4 Goals & Projects · 5 Life Areas · 6 Knowledge / PhD / English · 7 Career / Finance / Intellectual Assets · 8 Review System · 9 Smart Insights & Automation.
 
 ## 3. Approved decisions (as of 30 Sep 2026)
 
@@ -64,7 +64,7 @@ Full Phase 0 document lives in the project files (`phase-0/REEM_LIFE_OS_Phase0_A
 
 ## 5. Stack and code layout
 
-Next.js **15.5** (App Router) · React 19 · TypeScript **5.9** (TS 7 breaks `next.config.ts` on Next 15) · Tailwind CSS 4 · Radix Dialog · next-themes · lucide-react · Supabase (Postgres + Auth via `@supabase/ssr`) · Drizzle ORM · Vitest · Playwright · fonts via `@fontsource` (IBM Plex Sans Arabic, IBM Plex Sans, Newsreader). Runs **locally on Reem's Mac** (decided 30 Sep 2026: she does not want it online). No hosting.
+Next.js **15.5** (App Router) · React 19 · TypeScript **5.9** (TS 7 breaks `next.config.ts` on Next 15) · Tailwind CSS 4 · Radix Dialog · next-themes · lucide-react · SQLite (`better-sqlite3`) + Drizzle ORM · optional Supabase auth (unused locally) · Vitest · Playwright · fonts via `@fontsource` (IBM Plex Sans Arabic, IBM Plex Sans, Newsreader). Runs **locally on Reem's Mac** (decided 30 Sep 2026: she does not want it online). No hosting.
 
 ```
 src/app/globals.css          design tokens (the only place colours are defined)
@@ -83,7 +83,13 @@ src/lib/areas.ts             the 11 Life Areas
 src/lib/time/calendar.ts     calendar rules + Arabic formatting (MONTHS_AR, formatDayShortAr, formatRangeAr)
 src/lib/time/current.ts      "where am I" for the time bar
 src/lib/config.ts            timezone, week start, capacity defaults, authConfigured
-src/db/schema.ts, drizzle/   Drizzle schema (Phase 1: app_settings only, RLS on)
+src/db/schema.ts, drizzle/   SQLite schema + migrations (settings, period_plans, area_focus, events)
+src/db/index.ts              getDb(): opens data/reem.db, applies migrations, seeds a fresh DB (Q4 2026 plan)
+src/db/repo.ts               all reads/writes (plans, focus, events with yearly repeat, settings, export)
+src/lib/validate.ts          form validation with Arabic messages; src/lib/periods.ts period key → dates
+src/app/(app)/actions.ts     server actions for every form
+src/components/plan/         EditableSection + ActionForm (keeps input on errors), plan/focus/event/settings forms
+src/app/api/backup/          JSON download of everything
 tests/e2e/                   Playwright specs; src/**/*.test.ts Vitest
 ```
 
@@ -91,11 +97,20 @@ tests/e2e/                   Playwright specs; src/**/*.test.ts Vitest
 
 **Auth:** if `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are unset the app runs in "Preview mode" (no login, nothing saved). When set, every page requires a session, and **only `ALLOWED_EMAIL` can sign in** (if it's unset, nobody can).
 
-## 6. What Phase 1 built (awaiting Reem's approval)
+## 6. What is built
 
-Design tokens and components; sidebar with 6 collapsible groups (remembered) and icon rail; time bar on every page (`2026 › Q3 › سبتمبر › W39 · 26 سبتمبر – 2 أكتوبر › الأربعاء 30 سبتمبر ● energy`, each part a link); Quick Capture dialog (Idea default, Task/Outcome/Date; saving arrives with the database); dark/light theme; responsive shell (drawer below 1024px, bottom bar Home/Today/Week/Capture below 768px); magic-link auth; designed empty page for every route, each saying which phase fills it.
+**Phase 1 (approved 30 Sep 2026):** design tokens and components; sidebar with 6 collapsible groups (remembered) and icon rail; time bar on every page; Quick Capture dialog (does not save yet: Phase 3); dark/light theme; responsive shell (drawer below 1024px, bottom bar below 768px); designed empty page for every route, each saying which phase fills it.
 
-Tests (all passing): 17 Vitest (calendar rules incl. Q4 2026 check, Arabic formatting, navigation has no duplicates) + 125 Playwright across desktop/tablet/phone (every route renders with one h1 and no console errors, dir=rtl + lang=ar, no Arabic-Indic digits, no horizontal scroll, no broken internal links, 404s for invalid periods, calendar weeks, one home for Knowledge/Assets, Quick Capture, theme persistence, sidebar collapse/rail persistence, sidebar fits 1440×900 and sits on the right, drawer and bottom bar, only pink/mint hues).
+**Phase 2 (built 30 Sep 2026, awaiting Reem's approval):**
+- Local SQLite database, created automatically on first run; migrations run on startup. A fresh database is seeded with the Q4 2026 plan (quarter theme, 4 priorities, area focus, Oct/Nov/Dec themes, 2 important dates). `REEM_SEED=off` skips it.
+- Year page: theme, vision, top priorities (≤5), status, area focus, important dates, Q1–Q4 cards with their themes, year selector (includes any year with a plan). Past years are a read-only archive.
+- Quarter page: theme, intention, priorities (≤5; become Objectives linked to goals in Phase 4), area focus, important dates, month cards with themes and week counts.
+- Month page: theme, intention, top outcomes (≤5), real 4/5 weeks, important dates, area focus.
+- Important Dates (Event): important date / deadline / travel / appointment, optional end date, optional yearly repeat, optional life area. Hiding archives (never deletes).
+- Settings are editable and stored: week start (Sat/Sun/Mon), time zone, all capacity limits. Backup: Settings → download JSON (`/api/backup`).
+- Plans, focus and events are edited in place (Edit button on each card). Errors are in Arabic and keep what was typed.
+
+Tests (all passing): 36 Vitest (calendar, navigation, period dates, validation, database: seed, plan upsert, focus replace, yearly and multi-day events, archive, settings) + 150 Playwright across desktop/tablet/phone (Phase 1 suite + seeded Q4 plan, save and reload, errors keep input, month → quarter flow, area focus, events add/validate/hide, archive read-only, settings, backup). E2E uses its own database file.
 
 ## 7. Commands
 
@@ -106,7 +121,8 @@ npm run typecheck
 npm test                            # Vitest
 npm run build && npx next start -p 3100 &
 PW_NO_SERVER=1 npx playwright test  # E2E against port 3100
-npm run db:generate / db:migrate    # Drizzle (needs DATABASE_URL)
+npm run db:generate                 # after changing src/db/schema.ts: writes a new migration in drizzle/ (applied automatically on next start)
+DATABASE_PATH=/tmp/e2e.db npx next start -p 3100   # e2e server with a throwaway database
 ```
 The Ctrl+K test waits for `networkidle` because the shortcut listens only after hydration.
 
@@ -120,5 +136,5 @@ The Ctrl+K test waits for `networkidle` because the shortcut listens only after 
 
 ## 9. Next steps
 
-1. Get Reem's **approval of Phase 1** (she runs it locally on her Mac). (Local SQLite storage is already approved.)
-2. Only then start **Phase 2 — Annual / Quarter / Month**: `PeriodPlan` + `AreaFocus` + Important Dates (Event) tables with migrations, year selector with archive, Q1–Q4, months with real 4/5 weeks, themes, top outcomes, area focus, editable settings (week start, time zone, capacity). Test calendar correctness, persistence, forms and errors, then stop for approval again.
+1. Get Reem's **approval of Phase 2** (she runs it locally: `git pull`, `npm install`, `npm run dev`).
+2. Only then start **Phase 3 — Week & Today**: week plan (theme, Weekly Outcomes ≤5, buffer), Today (energy GREEN/YELLOW/RED, Big 3, tasks, appointments), Skip / Move / Pause (no Overdue), light Daily Checkout and Weekly Review, Habits basics, Anti-Overload basics, Quick Capture saving. Test, then stop for approval again.

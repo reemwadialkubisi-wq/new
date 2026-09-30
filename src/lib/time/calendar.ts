@@ -189,3 +189,8 @@ export function formatRangeAr(a: Date, b: Date): string {
   if (a.getUTCMonth() === b.getUTCMonth()) return `${a.getUTCDate()}–${b.getUTCDate()} ${MONTHS_AR[b.getUTCMonth()]}`;
   return `${a.getUTCDate()} ${MONTHS_AR[a.getUTCMonth()]} – ${b.getUTCDate()} ${MONTHS_AR[b.getUTCMonth()]}`;
 }
+
+/** "31 أكتوبر" */
+export function formatDateAr(d: Date): string {
+  return `${d.getUTCDate()} ${MONTHS_AR[d.getUTCMonth()]}`;
+}

@@ -79,7 +79,7 @@ test("Quick Capture opens with Ctrl+K, validates, and closes with Escape", async
   await dialog.getByRole("textbox").fill("فكرة كتاب عن القيادة");
   await dialog.getByRole("radio", { name: "مهمة" }).click();
   await dialog.getByRole("button", { name: "دوِّني" }).click();
-  await expect(dialog.getByText(/دُوِّنت في المعاينة فقط/)).toBeVisible();
+  await expect(dialog.getByText(/لم تُحفظ بعد/)).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(dialog).toBeHidden();
 });

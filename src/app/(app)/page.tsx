@@ -6,7 +6,7 @@ import { ENERGY, Progress, SignalDot, type Energy } from "@/components/ui/status
 import { Planned } from "@/components/ui/planned";
 import { CaptureBar } from "@/components/shell/capture-bar";
 import { LIFE_AREAS } from "@/lib/areas";
-import { appConfig } from "@/lib/config";
+import { getSettings } from "@/db/repo";
 import { formatDayLongAr } from "@/lib/time/calendar";
 import { currentPeriods } from "@/lib/time/current";
 import { cn } from "@/lib/utils";
@@ -23,7 +23,7 @@ export default function HomePage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={`${greeting(appConfig.timeZone)} يا ريم`}
+        title={`${greeting(getSettings().timeZone)} يا ريم`}
         subtitle={
           <>
             {formatDayLongAr(now.today)}

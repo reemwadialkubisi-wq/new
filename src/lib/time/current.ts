@@ -1,15 +1,16 @@
-import { appConfig } from "../config";
+import { getSettings } from "@/db/repo";
+import type { AppSettings } from "../config";
 import {
   MONTHS_AR, formatDayShortAr, formatRangeAr, monthKey, quarterKey, quarterOfMonth, todayIn, toISODate, weekInfo,
 } from "./calendar";
 
 /** "Where am I?" — the current period at every level, with links. */
-export function currentPeriods(now: Date = new Date()) {
-  const today = todayIn(appConfig.timeZone, now);
+export function currentPeriods(now: Date = new Date(), settings: Pick<AppSettings, "timeZone" | "weekStart"> = getSettings()) {
+  const today = todayIn(settings.timeZone, now);
   const year = today.getUTCFullYear();
   const month = today.getUTCMonth();
   const quarter = quarterOfMonth(month);
-  const week = weekInfo(today, appConfig.weekStart);
+  const week = weekInfo(today, settings.weekStart);
   return {
     today,
     year: { label: String(year), href: `/year/${year}` },

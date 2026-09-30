@@ -4,7 +4,7 @@ import { CalendarClock, Target, NotebookPen, Hourglass } from "lucide-react";
 import { Card, Section, SectionTitle } from "@/components/ui/card";
 import { MainWithRail, PageHeader, PeriodNav } from "@/components/ui/page-header";
 import { Planned } from "@/components/ui/planned";
-import { appConfig } from "@/lib/config";
+import { getSettings } from "@/db/repo";
 import {
   MONTHS_AR, WEEKDAYS_AR, addDays, formatRangeAr, parseISODate, sameDay, toISODate, weekInfo,
 } from "@/lib/time/calendar";
@@ -15,7 +15,7 @@ type Props = { params: Promise<{ date: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const d = parseISODate((await params).date);
-  return { title: d ? `الأسبوع ${weekInfo(d, appConfig.weekStart).number}` : "الأسبوع" };
+  return { title: d ? `الأسبوع ${weekInfo(d, getSettings().weekStart).number}` : "الأسبوع" };
 }
 
 const WEEK_AREAS = ["العمل", "الأسرة", "الصحة", "الدكتوراه والمعرفة", "الإنجليزية", "شخصي واجتماعي"];
@@ -23,7 +23,7 @@ const WEEK_AREAS = ["العمل", "الأسرة", "الصحة", "الدكتور�
 export default async function WeekPage({ params }: Props) {
   const d = parseISODate((await params).date);
   if (!d) notFound();
-  const w = weekInfo(d, appConfig.weekStart);
+  const w = weekInfo(d, getSettings().weekStart);
   if (!sameDay(w.start, d)) redirect(`/week/${toISODate(w.start)}`);
   const now = currentPeriods();
   const days = Array.from({ length: 7 }, (_, i) => addDays(w.start, i));
@@ -36,7 +36,7 @@ export default async function WeekPage({ params }: Props) {
         english={`W${w.number}`}
         subtitle={
           <>
-            {formatRangeAr(w.start, w.end)} {w.end.getUTCFullYear()} · من السبت إلى الجمعة
+            {formatRangeAr(w.start, w.end)} {w.end.getUTCFullYear()} · من {WEEKDAYS_AR[w.start.getUTCDay()]} إلى {WEEKDAYS_AR[w.end.getUTCDay()]}
             {w.bridge ? <span className="text-ink-3"> · أسبوع عابر بين Q{w.quarter} وQ{(w.quarter % 4) + 1}</span> : null}
           </>
         }

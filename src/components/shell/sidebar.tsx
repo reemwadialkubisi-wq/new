@@ -144,7 +144,7 @@ export function SidebarFooter({ rail, authConfigured, onNavigate }: { rail?: boo
           <>
             <span className="flex-1">الإعدادات</span>
             {authConfigured ? null : (
-              <span className="text-2xs text-ink-4" title="غير متصلة بقاعدة البيانات بعد: لا يوجد تسجيل دخول ولا يُحفظ شيء.">وضع المعاينة</span>
+              <span className="text-2xs text-ink-4" title="بياناتك محفوظة على هذا الجهاز فقط.">محلي</span>
             )}
           </>
         )}

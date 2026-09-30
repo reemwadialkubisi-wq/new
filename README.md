@@ -6,26 +6,32 @@ Architecture: `phase-0/REEM_LIFE_OS_Phase0_Architecture.md` (project files).
 **Current phase: 1 — Design System & App Shell** (awaiting approval).
 
 ## Stack
-Next.js 15 (App Router) · TypeScript · Tailwind CSS 4 · Radix · Supabase (Postgres + Auth) · Drizzle · Vitest · Playwright · Vercel.
+Next.js 15 (App Router) · TypeScript · Tailwind CSS 4 · Radix · SQLite + Drizzle (local database) · Vitest · Playwright. Runs locally on your Mac.
 
 ## Run locally
 ```bash
 npm install
-cp .env.example .env.local   # optional: without Supabase keys the app runs in preview mode (no login, nothing saved)
+# nothing to configure: the database is created in data/reem.db on first run
 npm run dev                  # http://localhost:3000
 ```
 
 ## Checks
 ```bash
 npm run typecheck
-npm test            # calendar + navigation rules (Vitest)
+npm test            # calendar, validation and database rules (Vitest)
 npm run build && npm run test:e2e   # every route at desktop 1440, tablet 834, phone (Playwright)
 ```
 
-## Connecting (one time)
-1. **GitHub** — push this folder to a private repository.
-2. **Supabase** — create a project; in Vercel set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `ALLOWED_EMAIL`, `DATABASE_URL`; run `npm run db:migrate`. In Supabase Auth → URL configuration add `https://<your-domain>/auth/callback`.
-3. **Vercel** — import the GitHub repository. Every push deploys.
+## Your data
+Everything is saved in `data/reem.db` inside this folder, on your Mac only (never pushed to GitHub).
+Settings → «تنزيل نسخة احتياطية» downloads a JSON backup.
+
+## Updating to a new version
+```bash
+git pull
+npm install
+npm run dev
+```
 
 ## Structure
 ```

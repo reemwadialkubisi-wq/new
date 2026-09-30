@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CalendarClock, Flag, NotebookPen, Target, Wallet } from "lucide-react";
+import { Flag, NotebookPen, Wallet } from "lucide-react";
 import { Section } from "@/components/ui/card";
 import { MainWithRail, PageHeader, PeriodNav } from "@/components/ui/page-header";
 import { Planned } from "@/components/ui/planned";
-import { appConfig } from "@/lib/config";
+import { EventsSection, FocusSection, PlanSection } from "@/components/plan/sections";
+import { getPlan, getSettings } from "@/db/repo";
+import { periodRef } from "@/lib/periods";
 import { MONTHS, MONTHS_AR, formatRangeAr, monthKey, parseMonthKey, quarterOfMonth, sameDay, shiftMonth, toISODate, weeksOfMonth } from "@/lib/time/calendar";
 import { currentPeriods } from "@/lib/time/current";
 import { cn } from "@/lib/utils";
@@ -18,25 +20,45 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function MonthPage({ params }: Props) {
-  const m = parseMonthKey((await params).key);
-  if (!m) notFound();
-  const now = currentPeriods();
-  const weeks = weeksOfMonth(m.year, m.month, appConfig.weekStart);
+  const key = (await params).key;
+  const m = parseMonthKey(key);
+  const ref = periodRef("month", key);
+  if (!m || !ref) notFound();
+  const settings = getSettings();
+  const now = currentPeriods(undefined, settings);
+  const archive = m.year < now.today.getUTCFullYear();
+  const weeks = weeksOfMonth(m.year, m.month, settings.weekStart);
+  const plan = getPlan("month", ref.key);
+  const today = now.today.toISOString().slice(0, 10);
   const prev = shiftMonth(m.year, m.month, -1);
   const next = shiftMonth(m.year, m.month, 1);
 
   return (
     <>
       <PageHeader
-        eyebrow={`${m.year} · Q${quarterOfMonth(m.month)}`}
+        eyebrow={<><Link href={`/year/${m.year}`} className="hover:text-ink">{m.year}</Link> · <Link href={`/quarter/${m.year}-q${quarterOfMonth(m.month)}`} className="hover:text-ink">Q{quarterOfMonth(m.month)}</Link></>}
         title={`${MONTHS_AR[m.month]} ${m.year}`}
         english={MONTHS[m.month]}
-        subtitle={`${weeks.length} أسابيع تخطيط · لم يُحدد عنوان الشهر بعد`}
+        subtitle={`${weeks.length} أسابيع تخطيط · ${plan?.theme || "لم يُحدد عنوان الشهر بعد"}`}
         action={<PeriodNav prev={`/month/${monthKey(prev.year, prev.month)}`} next={`/month/${monthKey(next.year, next.month)}`} current={now.month.href} />}
       />
       <MainWithRail
         main={
           <>
+            <PlanSection
+              level="month"
+              periodKey={ref.key}
+              plan={plan}
+              readOnly={archive}
+              title="خطة الشهر · Month Plan"
+              labels={{
+                theme: "عنوان الشهر · Theme",
+                themeHint: "مثال: أكتوبر = إعادة ضبط",
+                intention: "النية · Intention",
+                priorities: "أهم النتائج · Top Outcomes",
+                prioritiesHint: "3 إلى 5 نتائج تجعل هذا الشهر شهرًا جيدًا.",
+              }}
+            />
             <Section title="أسابيع هذا الشهر" meta="الأسبوع ينتمي للشهر الذي يضم 4 أيام أو أكثر منه">
               <ul className="divide-y divide-border">
                 {weeks.map((w) => {
@@ -54,15 +76,18 @@ export default async function MonthPage({ params }: Props) {
                 })}
               </ul>
             </Section>
-            <Planned title="أهم النتائج · Top Outcomes" meta="3–5" empty="لا توجد نتائج شهرية بعد" icon={Target} phase={2}>
-              النتائج القليلة التي تجعل هذا الشهر شهرًا جيدًا.
-            </Planned>
             <Planned title="المحطات الرئيسية · Milestones" empty="لا توجد محطات مستحقة هذا الشهر" icon={Flag} phase={4} />
           </>
         }
         rail={
           <>
-            <Planned title="تواريخ مهمة" empty="لا توجد تواريخ هذا الشهر" icon={CalendarClock} phase={2} />
+            <EventsSection
+              from={ref.startDate}
+              to={ref.endDate}
+              defaultDate={today >= ref.startDate && today <= ref.endDate ? today : ref.startDate}
+              readOnly={archive}
+            />
+            <FocusSection level="month" periodKey={ref.key} plan={plan} readOnly={archive} />
             <Planned title="المراجعة الشهرية · Monthly Review" meta="≤ 60 د" empty="تُفتح في نهاية الشهر" icon={NotebookPen} phase={8}>
               ما الذي نجح؟ ما الذي استنزفني؟ ما الذي يتوقف أو يستمر أو ينتقل؟
             </Planned>

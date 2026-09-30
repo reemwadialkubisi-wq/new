@@ -63,8 +63,8 @@ function QuickCaptureDialog({ open, onOpenChange }: { open: boolean; onOpenChang
       inputRef.current?.focus();
       return;
     }
-    // Phase 1 is the shell only. Saving connects to the database in Phase 3 (Ideas/Tasks) — see roadmap.
-    setNote("دُوِّنت في المعاينة فقط. الحفظ في صندوق الأفكار يعمل بعد ربط قاعدة البيانات.");
+    // Saving captures arrives with Today/Tasks (Phase 3) and the Idea Inbox; until then nothing is stored.
+    setNote("لم تُحفظ بعد: حفظ التدوين السريع يأتي في المرحلة 3. التواريخ المهمة تُضاف من صفحة الشهر أو السنة.");
     setText("");
   }
 

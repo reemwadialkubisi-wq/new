@@ -49,6 +49,13 @@ test("daily routine: ticks feed habits, the knowledge slot counts toward the pic
   await expect(page.getByRole("button", { name: "إلغاء: الدكتوراه" })).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByRole("button", { name: "تم: إنجليزي" })).toContainText(`${englishBefore}/3`);
 
+  // each tick also lands in its life area
+  await page.goto("/areas/phd");
+  await expect(page.getByTestId("area-ticks")).toContainText("هدف معرفي واحد فقط: الدكتوراه");
+  await page.goto("/areas/health");
+  await expect(page.getByTestId("routine-progress").locator("li", { hasText: /^حركة/ })).toContainText(`${base + 1} من 3`);
+  await page.goto("/today", { waitUntil: "networkidle" });
+
   // energy
   await page.getByRole("button", { name: /^YELLOW/ }).click();
   await expect(page.getByRole("button", { name: /^YELLOW/ })).toHaveAttribute("aria-pressed", "true");

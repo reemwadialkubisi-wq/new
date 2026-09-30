@@ -314,6 +314,33 @@ export function routineProgress(weekFrom: string, weekTo: string): RoutineProgre
     .map((i) => progressOf(i, weekFrom, weekTo));
 }
 
+/**
+ * What a life area got this week, straight from routine ticks: each tick lands in its item's area,
+ * except a choice slot, which lands in the area of the habit she picked (English → English).
+ */
+export function areaWeek(area: string, weekFrom: string, weekTo: string) {
+  const db = getDb();
+  const habitArea = new Map(db.select().from(habits).all().map((h) => [h.id, h.area]));
+  const rows = db
+    .select({ itemId: routineChecks.itemId, habitId: routineChecks.habitId, title: routineItems.title, itemArea: routineItems.area, choices: routineItems.choiceHabitIds })
+    .from(routineChecks)
+    .innerJoin(routineItems, eq(routineChecks.itemId, routineItems.id))
+    .where(between(weekFrom, weekTo))
+    .all();
+  const counts = new Map<string, number>();
+  for (const r of rows) {
+    const landed = r.choices?.length && r.habitId ? habitArea.get(r.habitId) : r.itemArea;
+    if (landed !== area) continue;
+    const label = r.choices?.length && r.habitId ? `${r.title}: ${listHabits().find((h) => h.id === r.habitId)?.title ?? ""}` : r.title;
+    counts.set(label, (counts.get(label) ?? 0) + 1);
+  }
+  return {
+    ticks: [...counts].map(([title, n]) => ({ title, n })),
+    total: [...counts.values()].reduce((a, b) => a + b, 0),
+    habits: habitProgress(weekFrom, weekTo).filter((h) => h.habit.area === area),
+  };
+}
+
 /* Energy (one per day) */
 
 export function getEnergy(day: string): EnergyLevel | null {

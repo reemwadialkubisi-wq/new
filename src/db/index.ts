@@ -14,7 +14,7 @@ export function databasePath() {
   return process.env.DATABASE_PATH || path.join(process.cwd(), "data", "reem.db");
 }
 
-const g = globalThis as unknown as { __reemDb?: DB };
+const g = globalThis as unknown as { __reemDb?: DB; __reemSqlite?: Database.Database };
 
 /** Opens the local database once, applies any new migrations and seeds a fresh one. */
 export function getDb(): DB {
@@ -29,5 +29,13 @@ export function getDb(): DB {
   seed(db);
   seedRoutine(db);
   g.__reemDb = db;
+  g.__reemSqlite = sqlite;
   return db;
+}
+
+/** Closes the database (tests use it to check that data survives a restart). */
+export function closeDb() {
+  g.__reemSqlite?.close();
+  g.__reemDb = undefined;
+  g.__reemSqlite = undefined;
 }

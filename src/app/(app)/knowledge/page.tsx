@@ -4,10 +4,16 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/field";
 import { PageHeader } from "@/components/ui/page-header";
+import { AreaWeek } from "@/components/plan/routine";
+import { areaWeek } from "@/db/repo";
+import { toISODate } from "@/lib/time/calendar";
+import { currentPeriods } from "@/lib/time/current";
 
 export const metadata: Metadata = { title: "المعرفة" };
 
 export default function KnowledgePage() {
+  const w = currentPeriods().week.info;
+  const week = areaWeek("knowledge", toISODate(w.start), toISODate(w.end));
   return (
     <>
       <PageHeader
@@ -18,6 +24,9 @@ export default function KnowledgePage() {
       />
       <div className="mb-6 max-w-md">
         <Input aria-label="البحث في المعرفة" placeholder="ابحثي في الملاحظات…" disabled />
+      </div>
+      <div className="mb-6">
+        <AreaWeek data={week} />
       </div>
       <EmptyState icon={BookOpen} title="لا توجد ملاحظات معرفة بعد" phase={6}>
         ملاحظات من القراءة والدورات والحوارات، مرتبطة بالأفكار والأصول الفكرية.

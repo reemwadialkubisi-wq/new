@@ -206,3 +206,29 @@ export function RoutineProgressList({ habits, items }: { habits: HabitProgress[]
     </ul>
   );
 }
+
+/** An area's week, filled only by routine ticks (used on every Life Area page). */
+export function AreaWeek({ data }: { data: { ticks: { title: string; n: number }[]; total: number; habits: HabitProgress[] } }) {
+  return (
+    <Card className="p-6">
+      <SectionTitle meta={<span className="tabular-nums">{data.total} ✓</span>}>هذا الأسبوع · من جدول اليوم</SectionTitle>
+      {data.habits.length ? (
+        <div className="mt-4">
+          <RoutineProgressList habits={data.habits} items={[]} />
+        </div>
+      ) : null}
+      {data.ticks.length ? (
+        <ul className="mt-4 divide-y divide-border" data-testid="area-ticks">
+          {data.ticks.map((t) => (
+            <li key={t.title} className="flex items-baseline justify-between gap-3 py-2 text-sm">
+              <span className="text-ink-2" dir="auto">{t.title}</span>
+              <span className="text-xs tabular-nums text-ink-3">{t.n}</span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="mt-4 text-sm text-ink-3">لا علامات ✓ في هذا المجال هذا الأسبوع بعد.</p>
+      )}
+    </Card>
+  );
+}

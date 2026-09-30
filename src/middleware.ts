@@ -30,7 +30,8 @@ export async function middleware(request: NextRequest) {
   const isPublic = PUBLIC_PATHS.some((p) => path === p || path.startsWith(p + "/"));
 
   const allowed = process.env.ALLOWED_EMAIL?.toLowerCase();
-  if (user && allowed && user.email?.toLowerCase() !== allowed) {
+  // Single-user: if ALLOWED_EMAIL is missing, no signed-in user is accepted.
+  if (user && (!allowed || user.email?.toLowerCase() !== allowed)) {
     await supabase.auth.signOut();
     const to = request.nextUrl.clone();
     to.pathname = "/login";

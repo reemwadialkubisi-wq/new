@@ -14,14 +14,16 @@ async function sendLink(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) redirect("/login?error=invalid");
   const allowed = process.env.ALLOWED_EMAIL?.toLowerCase();
+  // Single-user app: without ALLOWED_EMAIL nobody may sign in.
+  if (!allowed) redirect("/login?error=not-configured");
   // Same message whether or not the email is allowed, so the page reveals nothing.
-  if (allowed && email !== allowed) redirect("/login?sent=1");
+  if (email !== allowed) redirect("/login?sent=1");
   const h = await headers();
   const origin = `${h.get("x-forwarded-proto") ?? "https"}://${h.get("host")}`;
   const supabase = await createSupabaseServer();
   const { error } = await supabase.auth.signInWithOtp({
     email,
-    options: { emailRedirectTo: `${origin}/auth/callback`, shouldCreateUser: !allowed || email === allowed },
+    options: { emailRedirectTo: `${origin}/auth/callback`, shouldCreateUser: true },
   });
   redirect(error ? "/login?error=failed" : "/login?sent=1");
 }
@@ -31,6 +33,7 @@ const ERRORS: Record<string, string> = {
   failed: "تعذّر إرسال رابط الدخول. حاولي مرة أخرى بعد قليل.",
   "not-allowed": "هذا الحساب لا يملك صلاحية الدخول.",
   link: "انتهت صلاحية رابط الدخول. اطلبي رابطًا جديدًا.",
+  "not-configured": "لم يُحدد البريد المسموح له بالدخول بعد (ALLOWED_EMAIL).",
 };
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string; sent?: string }> }) {

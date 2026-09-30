@@ -11,8 +11,8 @@ export const metadata: Metadata = { title: "Design System" };
 
 const COLORS = [
   ["bg", "Page"], ["surface", "Surface"], ["surface-2", "Surface 2"], ["border", "Border"],
-  ["ink", "Ink"], ["ink-2", "Ink 2"], ["ink-3", "Ink 3"], ["accent", "Accent · teal"],
-  ["green", "Energy · sage"], ["yellow", "Energy · amber"], ["red", "Energy · clay"], ["accent-soft", "Accent soft"],
+  ["ink", "Ink"], ["ink-2", "Ink 2"], ["ink-3", "Ink 3"], ["accent", "Accent · pink"],
+  ["green", "Success · mint"], ["yellow", "Energy · amber"], ["red", "Energy · clay"], ["accent-soft", "Accent soft"],
 ];
 
 export default function SystemPage() {
@@ -20,7 +20,7 @@ export default function SystemPage() {
     <>
       <PageHeader eyebrow="Settings" title="Design System" subtitle="The single source for every page: tokens, type and components." />
       <div className="space-y-6">
-        <Section title="Colour tokens" meta="Switch theme to see dark values">
+        <Section title="Colour tokens" meta="Switch theme to compare light and dark">
           <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
             {COLORS.map(([token, label]) => (
               <li key={token}>

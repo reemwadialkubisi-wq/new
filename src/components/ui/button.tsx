@@ -10,7 +10,7 @@ export const buttonVariants = cva(
         primary: "bg-accent text-accent-ink hover:bg-accent-hover",
         secondary: "border border-border-strong bg-surface text-ink hover:bg-surface-2",
         ghost: "text-ink-2 hover:bg-surface-2 hover:text-ink",
-        quiet: "text-accent hover:text-accent-hover underline-offset-4 hover:underline px-0",
+        quiet: "text-accent-text hover:underline underline-offset-4 hover:underline px-0",
       },
       size: {
         sm: "h-8 rounded-sm px-3 text-xs",

@@ -79,14 +79,21 @@ test("Quick Capture opens with Ctrl+K, validates, and closes with Escape", async
   await expect(dialog).toBeHidden();
 });
 
+test("dark night theme is the default", async ({ page }) => {
+  await page.goto("/", { waitUntil: "networkidle" });
+  await expect(page.locator("html")).toHaveClass(/dark/);
+});
+
 test("dark mode switches and persists", async ({ page }, info) => {
   await page.goto("/settings");
+  await page.getByRole("main").getByRole("radio", { name: "Light" }).click();
+  await expect(page.locator("html")).not.toHaveClass(/dark/);
   await page.getByRole("main").getByRole("radio", { name: "Dark" }).click();
   await expect(page.locator("html")).toHaveClass(/dark/);
   await page.reload();
   await expect(page.locator("html")).toHaveClass(/dark/);
   const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
-  expect(bg).toBe("rgb(15, 17, 19)");
+  expect(bg).toBe("rgb(15, 20, 32)");
   await page.getByRole("main").getByRole("radio", { name: "Light" }).click();
   await expect(page.locator("html")).not.toHaveClass(/dark/);
 });

@@ -33,7 +33,7 @@ export function Field({
       <label htmlFor={htmlFor} className="block text-xs font-medium text-ink-2">{label}</label>
       {children}
       {error ? (
-        <p className="text-xs text-red" role="alert">{error}</p>
+        <p className="text-xs text-red-text" role="alert">{error}</p>
       ) : hint ? (
         <p className="text-xs text-ink-3">{hint}</p>
       ) : null}

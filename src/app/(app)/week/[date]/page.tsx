@@ -56,7 +56,7 @@ export default async function WeekPage({ params }: Props) {
             const isFriday = day.getUTCDay() === 5;
             return (
               <li key={toISODate(day)} className={cn("px-3 py-3", isToday && "bg-accent-soft")}>
-                <div className={cn("text-2xs font-medium uppercase tracking-[0.08em]", isToday ? "text-accent" : "text-ink-3")}>
+                <div className={cn("text-2xs font-medium uppercase tracking-[0.08em]", isToday ? "text-accent-text" : "text-ink-3")}>
                   {shortWeekday(day)}
                 </div>
                 <div className={cn("mt-0.5 text-base tabular-nums", isToday ? "font-semibold text-ink" : "text-ink-2")}>

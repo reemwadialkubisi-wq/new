@@ -19,48 +19,59 @@
   --ink-3: #7a8089;
   --ink-4: #a3a8ae;
 
-  --accent: #2e6b66;
-  --accent-hover: #245753;
-  --accent-soft: #e4efec;
-  --accent-ink: #ffffff;
+  /* Reem's palette: pink = interaction, inspiration, achievement · mint = success, wellbeing, calm.
+     Together ~10-15% of the UI. Text on pink or mint fills is always dark. */
+  --accent: #cf6f9b;
+  --accent-hover: #c35d8c;
+  --accent-soft: #f8e6ee;
+  --accent-ink: #15181c;
+  --accent-text: #a4466f; /* pink text on light backgrounds */
 
-  --green: #5f8a68;
-  --green-soft: #e6eee6;
+  --green: #7fc3a7;
+  --green-soft: #e3f3ec;
+  --green-text: #34715a;
   --yellow: #a9843a;
   --yellow-soft: #f4ecda;
+  --yellow-text: #8a6a2a;
   --red: #a45c49;
   --red-soft: #f3e3dd;
+  --red-text: #a45c49;
 
-  --focus: #2e6b66;
+  --focus: #a4466f;
   --shadow-pop: 0 1px 2px rgb(20 24 28 / 0.04), 0 12px 32px -8px rgb(20 24 28 / 0.16);
   color-scheme: light;
 }
 
 .dark {
-  --bg: #0f1113;
-  --surface: #15181b;
-  --surface-2: #1b1f23;
-  --surface-3: #22272c;
-  --border: #262b30;
-  --border-strong: #353b42;
-  --ink: #eceeef;
-  --ink-2: #b4b9bf;
-  --ink-3: #858b92;
-  --ink-4: #5d636a;
+  /* Night background */
+  --bg: #0f1420;
+  --surface: #171d2b;
+  --surface-2: #1d2433;
+  --surface-3: #252d3f;
+  --border: #262e40;
+  --border-strong: #354057;
+  --ink: #eceef3;
+  --ink-2: #b6bccb;
+  --ink-3: #868ea3;
+  --ink-4: #5b6379;
 
-  --accent: #74b3aa;
-  --accent-hover: #8cc3bb;
-  --accent-soft: #1b2f2c;
-  --accent-ink: #0f1113;
+  --accent: #cf6f9b;
+  --accent-hover: #d985ab;
+  --accent-soft: #2c1d2b;
+  --accent-ink: #15181c;
+  --accent-text: #dc8cb0;
 
-  --green: #8fb497;
-  --green-soft: #1c2820;
+  --green: #7fc3a7;
+  --green-soft: #172a2a;
+  --green-text: #8fd0b4;
   --yellow: #d3b16b;
-  --yellow-soft: #2c2618;
+  --yellow-soft: #2b2719;
+  --yellow-text: #d3b16b;
   --red: #cd8a76;
-  --red-soft: #2f1f1a;
+  --red-soft: #2e1f22;
+  --red-text: #d99a87;
 
-  --focus: #74b3aa;
+  --focus: #dc8cb0;
   --shadow-pop: 0 1px 2px rgb(0 0 0 / 0.3), 0 16px 40px -8px rgb(0 0 0 / 0.55);
   color-scheme: dark;
 }
@@ -80,6 +91,10 @@
   --color-accent-hover: var(--accent-hover);
   --color-accent-soft: var(--accent-soft);
   --color-accent-ink: var(--accent-ink);
+  --color-accent-text: var(--accent-text);
+  --color-green-text: var(--green-text);
+  --color-yellow-text: var(--yellow-text);
+  --color-red-text: var(--red-text);
   --color-green: var(--green);
   --color-green-soft: var(--green-soft);
   --color-yellow: var(--yellow);

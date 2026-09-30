@@ -115,7 +115,7 @@ function QuickCaptureDialog({ open, onOpenChange }: { open: boolean; onOpenChang
                   onClick={() => setKind(value)}
                   className={cn(
                     "inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-xs font-medium transition-colors",
-                    kind === value ? "border-accent bg-accent-soft text-accent" : "border-border text-ink-2 hover:bg-surface-2",
+                    kind === value ? "border-accent bg-accent-soft text-accent-text" : "border-border text-ink-2 hover:bg-surface-2",
                   )}
                 >
                   <Icon className="size-3.5" aria-hidden />

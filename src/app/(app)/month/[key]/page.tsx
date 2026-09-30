@@ -44,9 +44,9 @@ export default async function MonthPage({ params }: Props) {
                   return (
                     <li key={toISODate(w.start)}>
                       <Link href={`/week/${toISODate(w.start)}`} className="-mx-2 flex items-center gap-4 rounded-md px-2 py-3 hover:bg-surface-2">
-                        <span className={cn("w-10 text-sm font-medium tabular-nums", current ? "text-accent" : "text-ink")}>W{w.number}</span>
+                        <span className={cn("w-10 text-sm font-medium tabular-nums", current ? "text-accent-text" : "text-ink")}>W{w.number}</span>
                         <span className="flex-1 text-sm text-ink-2">{formatRange(w.start, w.end)}</span>
-                        {current ? <span className="text-2xs font-medium text-accent">This week</span> : null}
+                        {current ? <span className="text-2xs font-medium text-accent-text">This week</span> : null}
                         <span className="text-2xs text-ink-4">No outcomes yet</span>
                       </Link>
                     </li>

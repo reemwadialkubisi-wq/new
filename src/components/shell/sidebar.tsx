@@ -35,7 +35,7 @@ export function Brand({ rail }: { rail?: boolean }) {
       <svg viewBox="0 0 28 28" className="size-7 shrink-0 text-ink" aria-hidden>
         <circle cx="14" cy="14" r="13" fill="currentColor" />
         <circle cx="14" cy="14" r="8" fill="none" stroke="var(--bg)" strokeWidth="1.5" />
-        <path d="M14 6a8 8 0 0 1 0 16Z" fill="var(--bg)" />
+        <path d="M14 6a8 8 0 0 1 0 16Z" fill="var(--accent)" />
       </svg>
       {rail ? null : (
         <span className="leading-tight">
@@ -91,10 +91,10 @@ export function NavTree({ rail, onNavigate }: { rail?: boolean; onNavigate?: () 
                         className={cn(
                           "flex h-7 items-center gap-3 rounded-md text-[13px] transition-colors",
                           rail ? "mx-auto w-10 justify-center" : "px-3",
-                          active ? "bg-surface-3 font-medium text-ink" : "text-ink-2 hover:bg-surface-2 hover:text-ink",
+                          active ? "bg-accent-soft font-medium text-ink" : "text-ink-2 hover:bg-surface-2 hover:text-ink",
                         )}
                       >
-                        <Icon className={cn("size-4 shrink-0", active ? "text-accent" : "text-ink-3")} aria-hidden />
+                        <Icon className={cn("size-4 shrink-0", active ? "text-accent-text" : "text-ink-3")} aria-hidden />
                         {rail ? <span className="sr-only">{item.label}</span> : <span className="truncate">{item.label}</span>}
                       </Link>
                     </li>

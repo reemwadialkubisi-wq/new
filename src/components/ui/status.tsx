@@ -5,9 +5,9 @@ import { cn } from "@/lib/utils";
 export type Energy = "GREEN" | "YELLOW" | "RED";
 
 export const ENERGY: Record<Energy, { label: string; meaning: string; dot: string; soft: string; text: string }> = {
-  GREEN: { label: "Green", meaning: "Normal plan", dot: "bg-green", soft: "bg-green-soft", text: "text-green" },
-  YELLOW: { label: "Yellow", meaning: "Reduce optional load", dot: "bg-yellow", soft: "bg-yellow-soft", text: "text-yellow" },
-  RED: { label: "Red", meaning: "Essentials only", dot: "bg-red", soft: "bg-red-soft", text: "text-red" },
+  GREEN: { label: "Green", meaning: "Normal plan", dot: "bg-green", soft: "bg-green-soft", text: "text-green-text" },
+  YELLOW: { label: "Yellow", meaning: "Reduce optional load", dot: "bg-yellow", soft: "bg-yellow-soft", text: "text-yellow-text" },
+  RED: { label: "Red", meaning: "Essentials only", dot: "bg-red", soft: "bg-red-soft", text: "text-red-text" },
 };
 
 export function EnergyChip({ level, className }: { level: Energy | null; className?: string }) {
@@ -50,11 +50,11 @@ export function SignalDot({ signal, withLabel = true }: { signal: AreaSignal | n
 
 export type EntityStatus = "active" | "planned" | "paused" | "incubating" | "completed" | "archived";
 const STATUS: Record<EntityStatus, string> = {
-  active: "bg-accent-soft text-accent",
+  active: "bg-accent-soft text-accent-text",
   planned: "bg-surface-2 text-ink-2",
-  paused: "bg-yellow-soft text-yellow",
+  paused: "bg-yellow-soft text-yellow-text",
   incubating: "bg-surface-2 text-ink-3",
-  completed: "bg-green-soft text-green",
+  completed: "bg-green-soft text-green-text",
   archived: "bg-surface-2 text-ink-4",
 };
 
@@ -92,7 +92,7 @@ export function Progress({ value, label, className }: { value: number | null; la
         aria-valuemax={100}
         aria-label={label}
       >
-        <div className="h-full rounded-full bg-accent transition-[width]" style={{ width: `${v}%` }} />
+        <div className="h-full rounded-full bg-green transition-[width]" style={{ width: `${v}%` }} />
       </div>
       <span className="w-9 text-right text-2xs tabular-nums text-ink-3">{value == null ? "—" : `${v}%`}</span>
     </div>

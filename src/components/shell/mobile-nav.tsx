@@ -55,7 +55,7 @@ export function BottomBar() {
       className="fixed inset-x-0 bottom-0 z-30 flex h-16 border-t border-border bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
     >
       {items.map(({ href, label, icon: Icon, active }) => (
-        <Link key={href} href={href} aria-current={active ? "page" : undefined} className={cn(cls, active ? "text-accent" : "text-ink-3")}>
+        <Link key={href} href={href} aria-current={active ? "page" : undefined} className={cn(cls, active ? "text-accent-text" : "text-ink-3")}>
           <Icon className="size-5" aria-hidden />
           {label}
         </Link>
